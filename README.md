@@ -1,14 +1,120 @@
 # TL;DR Article Summarizer
 
-An AI-powered Chrome extension that instantly summarizes web articles using FREE Hugging Face AI models.
+<div align="center">
 
-## Features
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
-- **One-click summarization** - Summarize any article with a single click
-- **Multiple summary lengths** - Choose between short, medium, or detailed summaries
-- **Smart content extraction** - Automatically identifies and extracts article content
-- **Copy to clipboard** - Easily copy summaries for later use
-- **Beautiful UI** - Modern, gradient-based design
+An AI-powered Chrome extension that instantly summarizes web articles using **FREE** Hugging Face AI models.
+
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Development](#development) • [Contributing](#contributing)
+
+</div>
+
+---
+
+## ✨ Features
+
+### 🎨 Modern Dark Theme
+- Discord/Claude/X/xAI inspired design
+- Sleek dark interface with gradient accents
+- Smooth animations and transitions
+
+### 🚀 Smart Summarization
+- **One-click summarization** - Get instant AI-powered summaries
+- **Multiple lengths** - Short (2-3 sentences), Medium (3-5 bullets), Detailed (7-10 bullets)
+- **Smart extraction** - Automatically identifies article content from any webpage
+- **Progress tracking** - Real-time progress bar with status updates
+
+### 📊 Insights & Metrics
+- **Word count** - See the original article length
+- **Reading time** - Estimated time to read the full article
+- **Processing time** - How fast the AI generated your summary
+- **Summary cache** - Stores last 20 summaries locally
+
+### ⌨️ Productivity Features
+- **Keyboard shortcuts** - `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)
+- **Copy to clipboard** - One-click copy functionality
+- **Beautiful UI** - Modern, responsive design
+
+### 💰 Completely FREE
+- Uses Hugging Face's free tier (30,000 requests/month)
+- No credit card required
+- Perfect for personal use (~1,000 summaries/day)
+
+## 📸 Screenshots
+
+![TL;DR Extension Demo](https://via.placeholder.com/800x400/18181b/8b5cf6?text=Add+Your+Screenshot+Here)
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Linux server (Ubuntu 20.04+)
+- Node.js 18+ and npm
+- Free Hugging Face account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/cyphorlogs/tldr-article-summarizer.git
+   cd tldr-article-summarizer
+   ```
+
+2. **Get FREE Hugging Face API Token**
+   - Sign up at [huggingface.co](https://huggingface.co/join)
+   - Go to [Settings > Tokens](https://huggingface.co/settings/tokens)
+   - Create a new token with **Read** permission
+   - Copy the token
+
+3. **Deploy Backend**
+   ```bash
+   cd backend
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+4. **Configure Environment**
+   ```bash
+   nano .env
+   # Add your Hugging Face token:
+   # HUGGINGFACE_TOKEN=hf_your_token_here
+   ```
+
+5. **Start the Server**
+   ```bash
+   npm install
+   pm2 start server.js --name article-summarizer-api
+   pm2 save
+   ```
+
+6. **Load Chrome Extension**
+   - Open Chrome and go to `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the `extension` folder
+   - Configure API URL: `http://your-server-ip:8090/api/summarize`
+
+**Detailed Setup:** See [QUICKSTART-HUGGINGFACE.md](QUICKSTART-HUGGINGFACE.md)
+
+## 📖 Usage
+
+1. **Navigate to any article** on the web
+2. **Press** `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)
+   - Or click the TL;DR extension icon
+3. **Select summary length** (Short/Medium/Detailed)
+4. **Click "Summarize This Article"**
+5. **Wait 2-5 seconds** for your AI-generated summary
+6. **Copy** or **Clear** the summary as needed
+
+## 🛠️ Tech Stack
+
+- **Frontend:** Chrome Extension API (Manifest V3), Vanilla JavaScript
+- **Backend:** Node.js, Express.js
+- **AI Model:** Hugging Face BART (facebook/bart-large-cnn)
+- **Styling:** Custom CSS with modern dark theme
+- **Storage:** Chrome Storage API for caching
 
 ## Project Structure
 
@@ -187,23 +293,78 @@ Using Hugging Face (FREE):
 - Make sure your API URL is correct in the extension
 - Check nginx configuration if using reverse proxy
 
-## Future Improvements
+## 🔮 Future Improvements
 
-- [ ] Add caching to avoid re-summarizing same articles
-- [ ] Save summaries locally in extension
-- [ ] Add authentication for API
-- [ ] Support for summarizing PDFs
-- [ ] Browser history of summaries
-- [ ] Dark mode toggle
-- [ ] Multiple AI model options
+- [ ] Auto-summarize on page load option
+- [ ] Multiple language support
+- [ ] Export summaries (PDF, Markdown)
+- [ ] Reading list integration
+- [ ] Custom prompt templates
+- [ ] Text-to-speech for summaries
+- [ ] Browser sync across devices
+- [ ] Highlight key sentences on page
+- [ ] Compare different summary styles
 
-## License
+## 🤝 Contributing
 
-MIT License - Feel free to use and modify!
+Contributions are welcome! Here's how you can help:
 
-## Credits
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
 
-Built with:
-- [Hugging Face](https://huggingface.co/) for FREE AI summarization (BART model)
-- [Express.js](https://expressjs.com/) for API server
-- Chrome Extensions API for browser integration
+Please make sure to update tests and documentation as appropriate.
+
+## 📝 License
+
+This project is licensed under the MIT License - see below for details:
+
+```
+MIT License
+
+Copyright (c) 2025 cyphorlogs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## 🙏 Credits & Acknowledgments
+
+Built with ❤️ using:
+- [Hugging Face](https://huggingface.co/) - FREE AI inference API (BART model)
+- [Express.js](https://expressjs.com/) - Fast, minimalist web framework
+- [Chrome Extensions API](https://developer.chrome.com/docs/extensions/) - Browser integration
+- Design inspiration from [Discord](https://discord.com), [Claude](https://claude.ai), [X](https://x.com), and [xAI](https://x.ai)
+
+## 📧 Contact & Support
+
+- **Author:** cyphorlogs
+- **GitHub:** [@cyphorlogs](https://github.com/cyphorlogs)
+- **Issues:** [Report a bug](https://github.com/cyphorlogs/tldr-article-summarizer/issues)
+
+---
+
+<div align="center">
+
+**⭐ Star this repo if you find it useful!**
+
+Made with 🤖 by [Claude Code](https://claude.com/claude-code)
+
+</div>
