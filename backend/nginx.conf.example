@@ -1,0 +1,39 @@
+# Nginx configuration for Article Summarizer API
+# Place this in /etc/nginx/sites-available/article-summarizer
+# Then create symlink: sudo ln -s /etc/nginx/sites-available/article-summarizer /etc/nginx/sites-enabled/
+
+server {
+    listen 80;
+    server_name your-domain.com;  # Replace with your domain
+
+    # Rate limiting to prevent abuse
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/m;
+
+    location / {
+        limit_req zone=api_limit burst=5 nodelay;
+
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+
+        # CORS headers (adjust as needed)
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type' always;
+
+        # Timeouts for long summarization requests
+        proxy_read_timeout 60s;
+        proxy_connect_timeout 60s;
+    }
+}
+
+# After setting up this config, run:
+# sudo nginx -t
+# sudo systemctl restart nginx
+# sudo certbot --nginx -d your-domain.com  # For SSL

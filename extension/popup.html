@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TL;DR Summarizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>TL;DR</h1>
+      <p class="tagline">Article Summarizer</p>
+    </header>
+
+    <div class="settings">
+      <label for="summaryType">Summary Length:</label>
+      <select id="summaryType">
+        <option value="short">Short (2-3 sentences)</option>
+        <option value="medium" selected>Medium (3-5 bullets)</option>
+        <option value="detailed">Detailed (7-10 bullets)</option>
+      </select>
+    </div>
+
+    <div class="config-section" id="configSection">
+      <p class="warning">Configure your API URL first</p>
+      <input type="text" id="apiUrl" placeholder="https://your-server.com/api/summarize">
+      <button id="saveConfig" class="btn-secondary">Save Configuration</button>
+    </div>
+
+    <button id="summarizeBtn" class="btn-primary" disabled>
+      Summarize This Article
+    </button>
+
+    <div id="progressContainer" class="progress-container">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      </div>
+      <div id="progressText" class="progress-text">Analyzing article...</div>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="summary" class="summary-container"></div>
+
+    <div class="actions" id="actions" style="display: none;">
+      <button id="copyBtn" class="btn-secondary">Copy to Clipboard</button>
+      <button id="clearBtn" class="btn-secondary">Clear</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
