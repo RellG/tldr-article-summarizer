@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TL;DR Article Summarizer",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "Summarize articles instantly with AI-powered insights",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {

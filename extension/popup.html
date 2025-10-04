@@ -9,16 +9,29 @@
 <body>
   <div class="container">
     <header>
-      <h1>TL;DR</h1>
-      <p class="tagline">Article Summarizer</p>
+      <div class="logo-container">
+        <div class="logo-icon">🤖</div>
+        <div class="logo-text">
+          <h1>TL;DR</h1>
+          <p class="tagline">AI Article Summarizer</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-button" title="Toggle dark/light mode">
+          <span class="theme-icon">☀️</span>
+        </button>
+        <a href="settings.html" class="icon-button" title="Settings">
+          <span>⚙️</span>
+        </a>
+      </div>
     </header>
 
     <div class="settings">
       <label for="summaryType">Summary Length:</label>
       <select id="summaryType">
-        <option value="short">Short (2-3 sentences)</option>
-        <option value="medium" selected>Medium (3-5 bullets)</option>
-        <option value="detailed">Detailed (7-10 bullets)</option>
+        <option value="short">Short</option>
+        <option value="medium" selected>Medium</option>
+        <option value="detailed">Detailed</option>
       </select>
     </div>
 
@@ -29,10 +42,34 @@
     </div>
 
     <button id="summarizeBtn" class="btn-primary" disabled>
-      Summarize This Article
+      <span class="btn-icon">✨</span>
+      <span class="btn-text">Summarize This Article</span>
     </button>
 
     <div id="progressContainer" class="progress-container">
+      <!-- Animated Book -->
+      <div class="book-animation">
+        <div class="book-cover">
+          <div class="book-spine"></div>
+          <div class="book-front">
+            <div class="book-title">TL;DR</div>
+          </div>
+        </div>
+        <div class="pages-container">
+          <div class="page page-1"></div>
+          <div class="page page-2"></div>
+          <div class="page page-3"></div>
+          <div class="page page-4"></div>
+          <div class="page page-5"></div>
+        </div>
+        <div class="sparkles">
+          <div class="sparkle sparkle-1">✨</div>
+          <div class="sparkle sparkle-2">✨</div>
+          <div class="sparkle sparkle-3">✨</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
       <div class="progress-bar">
         <div id="progressFill" class="progress-fill" style="width: 0%"></div>
       </div>
@@ -44,9 +81,17 @@
     <div id="summary" class="summary-container"></div>
 
     <div class="actions" id="actions" style="display: none;">
-      <button id="copyBtn" class="btn-secondary">Copy to Clipboard</button>
-      <button id="clearBtn" class="btn-secondary">Clear</button>
+      <button id="copyBtn" class="btn-secondary">
+        <span class="btn-icon">📋</span> Copy
+      </button>
+      <button id="clearBtn" class="btn-secondary">
+        <span class="btn-icon">🗑️</span> Clear
+      </button>
     </div>
+
+    <footer class="extension-footer">
+      <div class="footer-tip">💡 Press Ctrl+Shift+S for quick summarize</div>
+    </footer>
   </div>
 
   <script src="popup.js"></script>

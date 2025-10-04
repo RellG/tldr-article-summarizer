@@ -3,14 +3,38 @@ let API_URL = '';
 
 // Load saved configuration on popup open
 document.addEventListener('DOMContentLoaded', async () => {
-  const result = await chrome.storage.sync.get(['apiUrl']);
+  const result = await chrome.storage.sync.get(['apiUrl', 'theme', 'defaultSummaryType']);
   if (result.apiUrl) {
     API_URL = result.apiUrl;
     document.getElementById('apiUrl').value = API_URL;
     document.getElementById('summarizeBtn').disabled = false;
     document.getElementById('configSection').style.display = 'none';
   }
+
+  // Load theme preference
+  const theme = result.theme || 'dark';
+  document.body.setAttribute('data-theme', theme);
+  updateThemeIcon(theme);
+
+  // Load default summary type
+  const defaultSummaryType = result.defaultSummaryType || 'medium';
+  document.getElementById('summaryType').value = defaultSummaryType;
 });
+
+// Theme toggle
+document.getElementById('themeToggle').addEventListener('click', async () => {
+  const currentTheme = document.body.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+  document.body.setAttribute('data-theme', newTheme);
+  await chrome.storage.sync.set({ theme: newTheme });
+  updateThemeIcon(newTheme);
+});
+
+function updateThemeIcon(theme) {
+  const icon = document.querySelector('.theme-icon');
+  icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
 
 // Save configuration
 document.getElementById('saveConfig').addEventListener('click', async () => {
@@ -78,16 +102,30 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
     await sleep(300); // Brief pause for UX
     showProgress(60, 'AI is analyzing...');
 
-    // Send to API
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content,
-        url: tab.url,
-        summaryType
-      })
-    });
+    // Send to API with timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    let response;
+    try {
+      response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          url: tab.url,
+          summaryType
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Request timed out. The article might be too long or the server is busy.');
+      }
+      throw fetchError;
+    }
 
     showProgress(90, 'Generating summary...');
 

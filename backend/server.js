@@ -7,8 +7,11 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
 
-const HUGGINGFACE_TOKEN = process.env.HUGGINGFACE_TOKEN;
-const HUGGINGFACE_MODEL = process.env.HUGGINGFACE_MODEL || 'facebook/bart-large-cnn';
+// OpenRouter API Configuration
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1';
+const SITE_URL = process.env.SITE_URL || 'http://192.168.4.154:8090';
+const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -24,88 +27,92 @@ app.post('/api/summarize', async (req, res) => {
       return res.status(400).json({ error: 'No content provided' });
     }
 
-    if (!HUGGINGFACE_TOKEN) {
-      return res.status(500).json({ error: 'Hugging Face token not configured' });
+    if (!OPENROUTER_API_KEY) {
+      return res.status(500).json({ error: 'OpenRouter API key not configured' });
     }
 
-    // Limit content length - BART has a max of ~1024 tokens
-    const maxLength = 4000;
+    // Limit content length for API efficiency and speed
+    const maxLength = 5000;
     const truncatedContent = content.length > maxLength
       ? content.substring(0, maxLength) + '...'
       : content;
 
-    // Adjust parameters based on summary type
-    let maxSummaryLength, minSummaryLength;
+    // Build prompt based on summary type
+    let prompt;
     switch(summaryType) {
       case 'short':
-        minSummaryLength = 30;
-        maxSummaryLength = 80;
+        prompt = `Summarize the following article in 2-3 concise sentences:\n\n${truncatedContent}`;
         break;
       case 'detailed':
-        minSummaryLength = 150;
-        maxSummaryLength = 300;
+        prompt = `Provide a detailed summary of the following article in 7-10 sentences, covering all key points:\n\n${truncatedContent}`;
         break;
       case 'medium':
       default:
-        minSummaryLength = 60;
-        maxSummaryLength = 150;
+        prompt = `Summarize the following article in 3-5 clear sentences, capturing the main points:\n\n${truncatedContent}`;
     }
 
-    // Call Hugging Face API
-    const response = await fetch(
-      `https://api-inference.huggingface.co/models/${HUGGINGFACE_MODEL}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${HUGGINGFACE_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          inputs: truncatedContent,
-          parameters: {
-            max_length: maxSummaryLength,
-            min_length: minSummaryLength,
-            do_sample: false
-          }
-        })
+    // Call OpenRouter API with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+
+    let response;
+    try {
+      response = await fetch(
+        'https://openrouter.ai/api/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': SITE_URL,
+            'X-Title': SITE_NAME
+          },
+          body: JSON.stringify({
+            model: OPENROUTER_MODEL,
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a helpful assistant that creates clear, concise summaries of articles. Provide summaries in paragraph form without bullet points.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            temperature: 0.3,
+            max_tokens: 400
+          }),
+          signal: controller.signal
+        }
+      );
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Request timed out. Try with a shorter article or different summary type.');
       }
-    );
+      throw fetchError;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenRouter API error:', response.status, errorText);
+      throw new Error(`API request failed: ${response.status}`);
+    }
 
     const result = await response.json();
 
-    // Handle Hugging Face API errors
-    if (result.error) {
-      console.error('Hugging Face error:', result.error);
-
-      // Model is loading
-      if (result.error.includes('loading')) {
-        const estimatedTime = result.estimated_time || 20;
-        return res.status(503).json({
-          error: 'Model is loading',
-          message: `Model is warming up. Please try again in ${estimatedTime} seconds.`,
-          estimatedTime
-        });
-      }
-
-      throw new Error(result.error);
-    }
-
     // Extract summary from response
-    let summary = result[0]?.summary_text || result.summary_text || 'Unable to generate summary';
-
-    // Format as bullet points for medium/detailed
-    if (summaryType !== 'short' && !summary.includes('•') && !summary.includes('-')) {
-      const sentences = summary.match(/[^.!?]+[.!?]+/g) || [summary];
-      summary = sentences.map(s => `• ${s.trim()}`).join('\n');
-    }
+    const summary = result.choices?.[0]?.message?.content || 'Unable to generate summary';
 
     res.json({
-      summary,
+      summary: summary.trim(),
       originalLength: content.length,
       summaryLength: summary.length,
       url,
       timestamp: new Date().toISOString(),
-      model: HUGGINGFACE_MODEL
+      model: OPENROUTER_MODEL
     });
 
   } catch (error) {

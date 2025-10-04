@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TL;DR Settings</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      width: 500px;
+      min-height: 400px;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .back-button {
+      width: 36px;
+      height: 36px;
+      padding: 8px;
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #e4e4e7;
+    }
+
+    .back-button:hover {
+      background: #3f3f46;
+    }
+
+    body[data-theme="light"] .back-button {
+      background: #e9ecef;
+      border: 1px solid #ced4da;
+      color: #212529;
+    }
+
+    body[data-theme="light"] .back-button:hover {
+      background: #dee2e6;
+    }
+
+    .settings-section {
+      background: #18181b;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #27272a;
+    }
+
+    body[data-theme="light"] .settings-section {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+    }
+
+    .settings-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #a78bfa;
+    }
+
+    body[data-theme="light"] .settings-section h3 {
+      color: #7c3aed;
+    }
+
+    .settings-section p {
+      font-size: 12px;
+      color: #a1a1aa;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    body[data-theme="light"] .settings-section p {
+      color: #6c757d;
+    }
+
+    .save-success {
+      padding: 12px;
+      background: rgba(34, 197, 94, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 8px;
+      font-size: 12px;
+      text-align: center;
+      display: none;
+      margin-top: 15px;
+    }
+
+    body[data-theme="light"] .save-success {
+      background: rgba(40, 167, 69, 0.1);
+      color: #28a745;
+      border-color: rgba(40, 167, 69, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="settings-header">
+        <a href="popup.html" class="back-button" title="Back to main">←</a>
+        <div class="logo-text">
+          <h1 style="font-size: 24px;">Settings</h1>
+          <p class="tagline">Configure your extension</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- API Configuration -->
+    <div class="settings-section">
+      <h3>🔗 API Configuration</h3>
+      <p>Configure the backend API URL for article summarization.</p>
+      <input type="text" id="apiUrl" placeholder="http://your-server.com:8090/api/summarize">
+      <button id="saveApi" class="btn-primary">
+        <span class="btn-icon">💾</span>
+        <span class="btn-text">Save API URL</span>
+      </button>
+    </div>
+
+    <!-- Theme Settings -->
+    <div class="settings-section">
+      <h3>🎨 Appearance</h3>
+      <p>Choose your preferred color theme.</p>
+      <label for="themeSelect">Theme:</label>
+      <select id="themeSelect">
+        <option value="dark">Dark Mode</option>
+        <option value="light">Light Mode</option>
+      </select>
+    </div>
+
+    <!-- Default Summary Type -->
+    <div class="settings-section">
+      <h3>📝 Default Summary Length</h3>
+      <p>Set the default summary length when opening the extension.</p>
+      <label for="defaultSummaryType">Default Length:</label>
+      <select id="defaultSummaryType">
+        <option value="short">Short</option>
+        <option value="medium">Medium</option>
+        <option value="detailed">Detailed</option>
+      </select>
+    </div>
+
+    <!-- About -->
+    <div class="settings-section">
+      <h3>ℹ️ About</h3>
+      <p><strong>TL;DR Article Summarizer v2.4</strong></p>
+      <p>Powered by Meta Llama 3.3 70B via OpenRouter</p>
+      <p style="margin-bottom: 0;">Created with Claude Code</p>
+    </div>
+
+    <div id="saveSuccess" class="save-success">Settings saved successfully!</div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
