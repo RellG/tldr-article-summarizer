@@ -2,13 +2,15 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![AI Model](https://img.shields.io/badge/AI-Llama%203.3%2070B-purple.svg)
+![Free API](https://img.shields.io/badge/API-100%25%20FREE-brightgreen.svg)
 
-An AI-powered Chrome extension that instantly summarizes web articles using **FREE** Hugging Face AI models.
+An AI-powered Chrome extension that instantly summarizes web articles using **FREE** Meta Llama 3.3 70B via OpenRouter.
 
-[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Development](#development) • [Contributing](#contributing)
+[Features](#features) • [Quick Start](#quick-start) • [Installation](#installation) • [Usage](#usage) • [API](#api-endpoints)
 
 </div>
 
@@ -16,16 +18,19 @@ An AI-powered Chrome extension that instantly summarizes web articles using **FR
 
 ## ✨ Features
 
-### 🎨 Modern Dark Theme
-- Discord/Claude/X/xAI inspired design
-- Sleek dark interface with gradient accents
-- Smooth animations and transitions
+### 🎨 Beautiful Modern UI
+- **3D Page Flip Animation** - Realistic book with turning pages while loading
+- **Light & Dark Mode** - Toggle between themes with one click
+- **Custom Purple Book Icon** - Elegant icon for toolbar and extensions page
+- **Centered Design** - Clean, professional interface
+- **Smooth Animations** - Polished transitions throughout
 
-### 🚀 Smart Summarization
+### 🚀 Powerful AI Summarization
 - **One-click summarization** - Get instant AI-powered summaries
-- **Multiple lengths** - Short (2-3 sentences), Medium (3-5 bullets), Detailed (7-10 bullets)
+- **Multiple lengths** - Short (2-3 sentences), Medium (3-5 sentences), Detailed (7-10 sentences)
 - **Smart extraction** - Automatically identifies article content from any webpage
-- **Progress tracking** - Real-time progress bar with status updates
+- **Meta Llama 3.3 70B** - 70 billion parameter model for high-quality summaries
+- **Fast responses** - 1-3 seconds after initial warmup
 
 ### 📊 Insights & Metrics
 - **Word count** - See the original article length
@@ -33,298 +38,413 @@ An AI-powered Chrome extension that instantly summarizes web articles using **FR
 - **Processing time** - How fast the AI generated your summary
 - **Summary cache** - Stores last 20 summaries locally
 
+### ⚙️ Full Settings Page
+- **API Configuration** - Easy setup and management
+- **Theme Selection** - Choose Light or Dark mode
+- **Default Summary Length** - Set your preference
+- **About Section** - Version and model information
+
 ### ⌨️ Productivity Features
 - **Keyboard shortcuts** - `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)
 - **Copy to clipboard** - One-click copy functionality
-- **Beautiful UI** - Modern, responsive design
+- **Clear summaries** - Quick reset button
+- **Progress tracking** - Real-time status with animated book
 
 ### 💰 Completely FREE
-- Uses Hugging Face's free tier (30,000 requests/month)
-- No credit card required
-- Perfect for personal use (~1,000 summaries/day)
+- **100% FREE AI API** via OpenRouter (Meta Llama 3.3 70B)
+- **No rate limits** on free tier
+- **No credit card required**
+- **Perfect for unlimited use**
 
 ## 📸 Screenshots
 
-![TL;DR Extension Demo](https://via.placeholder.com/800x400/18181b/8b5cf6?text=Add+Your+Screenshot+Here)
+_Coming soon - Extension with 3D page flip animation, light/dark modes, and settings page_
 
 ## 🚀 Quick Start
 
+**⏱️ Get running in 10 minutes!** → See [QUICKSTART.md](QUICKSTART.md)
+
 ### Prerequisites
-- Linux server (Ubuntu 20.04+)
+- Linux server or local machine
 - Node.js 18+ and npm
-- Free Hugging Face account
+- Free OpenRouter account
 
-### Installation
+### Lightning Setup
 
-1. **Clone the repository**
+1. **Get FREE OpenRouter API Key**
    ```bash
-   git clone https://github.com/cyphorlogs/tldr-article-summarizer.git
-   cd tldr-article-summarizer
+   # Visit https://openrouter.ai/
+   # Sign up with GitHub/Google
+   # Create API key (starts with sk-or-v1-...)
    ```
 
-2. **Get FREE Hugging Face API Token**
-   - Sign up at [huggingface.co](https://huggingface.co/join)
-   - Go to [Settings > Tokens](https://huggingface.co/settings/tokens)
-   - Create a new token with **Read** permission
-   - Copy the token
-
-3. **Deploy Backend**
+2. **Clone & Deploy**
    ```bash
-   cd backend
-   chmod +x deploy.sh
-   ./deploy.sh
-   ```
-
-4. **Configure Environment**
-   ```bash
-   nano .env
-   # Add your Hugging Face token:
-   # HUGGINGFACE_TOKEN=hf_your_token_here
-   ```
-
-5. **Start the Server**
-   ```bash
+   git clone https://github.com/RellG/tldr-article-summarizer.git
+   cd tldr-article-summarizer/backend
    npm install
-   pm2 start server.js --name article-summarizer-api
-   pm2 save
    ```
 
-6. **Load Chrome Extension**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `extension` folder
-   - Configure API URL: `http://your-server-ip:8090/api/summarize`
+3. **Configure**
+   ```bash
+   cat > .env << EOF
+   OPENROUTER_API_KEY=sk-or-v1-your_key_here
+   OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
+   PORT=8090
+   EOF
+   ```
 
-**Detailed Setup:** See [QUICKSTART-HUGGINGFACE.md](QUICKSTART-HUGGINGFACE.md)
+4. **Start Server**
+   ```bash
+   node server.js
+   # Or with PM2: pm2 start server.js --name tldr-api
+   ```
+
+5. **Install Extension**
+   - Download `tldr-extension-v2.7-final.zip`
+   - Extract and load in Chrome (`chrome://extensions/`)
+   - Configure API URL in settings: `http://your-ip:8090/api/summarize`
 
 ## 📖 Usage
 
+### Basic Usage
 1. **Navigate to any article** on the web
-2. **Press** `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)
-   - Or click the TL;DR extension icon
+2. **Click the purple book icon** or press `Cmd+Shift+S` / `Ctrl+Shift+S`
 3. **Select summary length** (Short/Medium/Detailed)
 4. **Click "Summarize This Article"**
-5. **Wait 2-5 seconds** for your AI-generated summary
-6. **Copy** or **Clear** the summary as needed
+5. **Watch the 3D book pages flip** while AI analyzes
+6. **Get your summary** in 1-3 seconds!
+
+### Settings
+Click the ⚙️ icon to:
+- Configure API URL
+- Switch Light/Dark mode
+- Set default summary length
+- View version info
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Chrome Extension API (Manifest V3), Vanilla JavaScript
-- **Backend:** Node.js, Express.js
-- **AI Model:** Hugging Face BART (facebook/bart-large-cnn)
-- **Styling:** Custom CSS with modern dark theme
-- **Storage:** Chrome Storage API for caching
+### Frontend
+- **Chrome Extension** - Manifest V3
+- **Vanilla JavaScript** - No framework dependencies
+- **Custom CSS3** - 3D animations, gradients, transitions
+- **Chrome Storage API** - Local caching
 
-## Project Structure
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** - Lightweight API framework
+- **OpenRouter API** - AI model gateway
+- **Meta Llama 3.3 70B** - State-of-the-art language model
+
+### AI Model
+- **Model:** `meta-llama/llama-3.3-70b-instruct:free`
+- **Parameters:** 70 billion
+- **Provider:** OpenRouter (via Meta)
+- **Cost:** 100% FREE
+- **Speed:** 1-3 seconds
+- **Quality:** Excellent
+
+## 📁 Project Structure
 
 ```
 TL;DR/
-├── backend/              # API Server
-│   ├── server.js        # Express API server
-│   ├── package.json     # Node.js dependencies
-│   ├── .env.example     # Environment variables template
-│   ├── deploy.sh        # Deployment script
-│   └── nginx.conf.example # Nginx configuration
+├── backend/                    # API Server
+│   ├── server.js              # Express API with OpenRouter
+│   ├── package.json           # Node.js dependencies
+│   ├── .env.example           # Environment template
+│   ├── deploy.sh              # Automated deployment
+│   └── nginx.conf.example     # Nginx reverse proxy config
 │
-└── extension/           # Chrome Extension
-    ├── manifest.json    # Extension manifest
-    ├── popup.html       # Extension popup UI
-    ├── popup.js         # Extension logic
-    ├── styles.css       # Extension styles
-    └── icons/           # Extension icons
+└── extension/                 # Chrome Extension
+    ├── manifest.json          # Extension config v2.7.0
+    ├── popup.html             # Main popup UI
+    ├── popup.js               # Extension logic
+    ├── styles.css             # 3D animations & themes
+    ├── settings.html          # Settings page
+    ├── settings.js            # Settings logic
+    ├── create-better-icons.py # Icon generator script
+    └── icons/                 # Custom purple book icons
+        ├── icon16.png         # Toolbar icon
+        ├── icon48.png         # Extension page
+        └── icon128.png        # Details page
 ```
 
-## Setup Instructions
+## 🔧 Installation
 
-**Quick Start:** See [QUICKSTART-HUGGINGFACE.md](QUICKSTART-HUGGINGFACE.md) for a 10-minute setup guide!
-
-### Backend Setup (Linux Server)
+### Detailed Backend Setup
 
 1. **Prerequisites**
-   - Linux server (Ubuntu 20.04+ recommended)
-   - Domain name (optional, for SSL)
-   - FREE Hugging Face token from https://huggingface.co/settings/tokens
+   ```bash
+   # Node.js 18+
+   node --version  # Should be 18.0.0 or higher
+   npm --version
+   ```
 
-2. **Deploy the API**
+2. **Clone Repository**
+   ```bash
+   git clone https://github.com/RellG/tldr-article-summarizer.git
+   cd tldr-article-summarizer
+   ```
+
+3. **Backend Configuration**
    ```bash
    cd backend
-   chmod +x deploy.sh
-   ./deploy.sh
-   ```
-
-3. **Configure environment**
-   ```bash
-   nano .env
-   # Add your Hugging Face token:
-   # HUGGINGFACE_TOKEN=hf_your_token_here
-   # HUGGINGFACE_MODEL=facebook/bart-large-cnn
-   ```
-
-4. **Start the server**
-   ```bash
    npm install
-   pm2 start server.js --name article-summarizer-api
-   pm2 save
+
+   # Create .env file
+   cat > .env << EOF
+   # OpenRouter API Configuration
+   OPENROUTER_API_KEY=sk-or-v1-your_key_here
+   OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
+   SITE_URL=http://your-server-ip:8090
+   SITE_NAME=TL;DR Article Summarizer
+
+   # Server Configuration
+   PORT=8090
+   NODE_ENV=production
+   EOF
    ```
 
-5. **Test the API**
+4. **Start Server**
    ```bash
-   curl http://localhost:3000/health
+   # Development
+   node server.js
+
+   # Production with PM2
+   npm install -g pm2
+   pm2 start server.js --name tldr-api
+   pm2 save
+   pm2 startup  # Enable on boot
    ```
 
-### Extension Setup
+5. **Test API**
+   ```bash
+   # Health check
+   curl http://localhost:8090/health
 
-1. **Add extension icons**
-   - Place icon files (16x16, 48x48, 128x128) in `extension/icons/`
-   - Or create temporary placeholders for testing
+   # Test summarization
+   curl -X POST http://localhost:8090/api/summarize \
+     -H "Content-Type: application/json" \
+     -d '{"content":"Test article about AI.","summaryType":"short"}'
+   ```
 
-2. **Load extension in Chrome**
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode" (top right)
-   - Click "Load unpacked"
-   - Select the `extension` folder
+### Extension Installation
 
-3. **Configure the extension**
-   - Click the extension icon
-   - Enter your API URL: `http://your-server.com:3000/api/summarize`
-   - Click "Save Configuration"
+1. **Download Extension**
+   - Download `tldr-extension-v2.7-final.zip` from releases
+   - Or use the `extension/` folder from source
 
-### Production Setup (Optional)
+2. **Load in Chrome**
+   ```
+   1. Open Chrome → chrome://extensions/
+   2. Enable "Developer mode" (top right toggle)
+   3. Click "Load unpacked"
+   4. Select the extracted extension/ folder
+   5. Purple book icon appears in toolbar!
+   ```
 
-1. **Setup Nginx reverse proxy**
+3. **Configure Extension**
+   ```
+   1. Click purple book icon
+   2. Click ⚙️ Settings icon
+   3. Enter API URL: http://your-server-ip:8090/api/summarize
+   4. Click "Save API URL"
+   5. Choose Light/Dark mode
+   6. Set default summary length
+   ```
+
+## 🌐 Production Setup (Optional)
+
+### With Nginx & SSL
+
+1. **Install Nginx**
    ```bash
    sudo apt install nginx -y
-   sudo cp backend/nginx.conf.example /etc/nginx/sites-available/article-summarizer
-   sudo nano /etc/nginx/sites-available/article-summarizer
-   # Edit server_name to your domain
-   sudo ln -s /etc/nginx/sites-available/article-summarizer /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl restart nginx
    ```
 
-2. **Setup SSL with Let's Encrypt**
+2. **Configure Nginx**
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com;
+
+       location /api/summarize {
+           proxy_pass http://localhost:8090/api/summarize;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+3. **Setup SSL**
    ```bash
    sudo apt install certbot python3-certbot-nginx -y
    sudo certbot --nginx -d your-domain.com
    ```
 
-3. **Update extension configuration**
+4. **Update Extension**
    - Use HTTPS URL: `https://your-domain.com/api/summarize`
 
-## Usage
-
-1. Navigate to any article on the web
-2. Click the TL;DR extension icon
-3. Select your desired summary length
-4. Click "Summarize This Article"
-5. Wait a few seconds for the AI to generate the summary
-6. Copy the summary or clear it
-
-## API Endpoints
+## 📡 API Endpoints
 
 ### GET /health
 Health check endpoint
+
+**Request:**
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:8090/health
+```
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2025-10-11T12:00:00.000Z"
+}
 ```
 
 ### POST /api/summarize
-Summarize article content
+Summarize article content with AI
+
+**Request:**
 ```bash
-curl -X POST http://localhost:3000/api/summarize \
+curl -X POST http://localhost:8090/api/summarize \
   -H "Content-Type: application/json" \
   -d '{
-    "content": "Article text here...",
+    "content": "Full article text here...",
     "url": "https://example.com/article",
     "summaryType": "medium"
   }'
 ```
 
 **Parameters:**
-- `content` (required): Article text to summarize
-- `url` (optional): Source URL
-- `summaryType` (optional): "short", "medium" (default), or "detailed"
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `content` | string | Yes | Article text to summarize (max 4000 chars) |
+| `url` | string | No | Source URL for reference |
+| `summaryType` | string | No | "short", "medium" (default), or "detailed" |
 
 **Response:**
 ```json
 {
-  "summary": "Bullet point summary...",
+  "summary": "AI-generated summary in paragraph form...",
   "originalLength": 5000,
   "summaryLength": 250,
   "url": "https://example.com/article",
-  "timestamp": "2025-01-15T10:30:00.000Z"
+  "timestamp": "2025-10-11T12:00:00.000Z",
+  "model": "meta-llama/llama-3.3-70b-instruct:free"
 }
 ```
 
-## Costs
+## 💰 Costs & Pricing
 
-Using Hugging Face (FREE):
-- **30,000 requests/month** - Completely FREE!
-- Perfect for personal use (~1,000 summaries/day)
-- No credit card required
+### Current Setup (100% FREE!)
+- **API:** $0.00 - OpenRouter's free tier with Llama 3.3 70B
+- **Rate Limits:** None on free tier
+- **Requests:** Unlimited
+- **Server:** $5-10/month VPS or run locally for free
 
-### Alternative AI Options
+### Alternative AI Models
 
-| Service | Cost | Quality | Speed |
-|---------|------|---------|-------|
-| **Hugging Face** (default) | FREE (30k/month) | Good | 2-5s |
-| Claude API | $0.003/summary | Excellent | 1-2s |
-| Ollama (self-hosted) | FREE (unlimited) | Good | 5-10s |
+All FREE options available on OpenRouter:
 
-## Troubleshooting
+| Model | Speed | Quality | Best For |
+|-------|-------|---------|----------|
+| **Meta Llama 3.3 70B** (current) | Fast (1-3s) | Excellent | General use, high quality |
+| Google Gemini Flash 1.5 | Very Fast (<1s) | Excellent | Speed priority |
+| DeepSeek Chat | Fast (2-3s) | Very Good | Alternative to Llama |
 
-**Extension doesn't detect articles:**
-- Try clicking on the article text first
-- Some sites have complex layouts that may not be detected
-- Check browser console for errors
+Switch models by editing `OPENROUTER_MODEL` in `.env`
 
-**"Model is loading" message:**
-- This is normal for the first request (takes 20-30 seconds)
-- Wait and try again - subsequent requests will be fast
-- Models sleep after inactivity and need to reload
+## 🐛 Troubleshooting
 
-**API errors:**
-- Verify your Hugging Face token is correct
-- Check API server is running: `pm2 status`
-- View logs: `pm2 logs article-summarizer-api`
+### Common Issues
 
-**CORS errors:**
-- Make sure your API URL is correct in the extension
-- Check nginx configuration if using reverse proxy
+**"Failed to fetch" / Connection timeout**
+```bash
+# Check server is running
+ps aux | grep node
+# OR with PM2
+pm2 status
+
+# Check logs
+pm2 logs tldr-api
+# OR
+tail -f /tmp/tldr-api.log
+
+# Verify firewall allows port 8090
+sudo ufw status
+sudo ufw allow 8090
+```
+
+**"API request failed: 404"**
+- Check `OPENROUTER_MODEL` in `.env` is correct
+- Verify API key is valid at https://openrouter.ai/keys
+- Try a different free model
+
+**"No article content found"**
+- Click on the article text before summarizing
+- Try a different article (yahoo.com/news works well)
+- Check browser console for errors (F12)
+
+**Slow summaries (30+ seconds)**
+- First request takes longer (model warming up)
+- Switch to faster model: `google/gemini-flash-1.5:free`
+- Check internet connection speed
+
+**Extension not showing icon**
+- Reload extension in `chrome://extensions/`
+- Check that all icon files exist in `icons/` folder
+- Try removing and reinstalling extension
 
 ## 🔮 Future Improvements
 
-- [ ] Auto-summarize on page load option
-- [ ] Multiple language support
-- [ ] Export summaries (PDF, Markdown)
+- [ ] Browser-based local AI option (no server needed)
+- [ ] Multiple language support (Spanish, French, etc.)
+- [ ] Export summaries (PDF, Markdown, TXT)
 - [ ] Reading list integration
 - [ ] Custom prompt templates
 - [ ] Text-to-speech for summaries
-- [ ] Browser sync across devices
+- [ ] Cross-browser sync (Firefox, Safari)
 - [ ] Highlight key sentences on page
-- [ ] Compare different summary styles
+- [ ] Summary comparison (different models)
+- [ ] Article sentiment analysis
+- [ ] Key topics extraction
+- [ ] Related articles suggestions
 
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how you can help:
 
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to the branch** (`git push origin feature/AmazingFeature`)
-5. **Open a Pull Request**
+### Ways to Contribute
+- 🐛 Report bugs via [Issues](https://github.com/RellG/tldr-article-summarizer/issues)
+- 💡 Suggest features or improvements
+- 🔧 Submit pull requests
+- 📖 Improve documentation
+- ⭐ Star the repository!
 
-Please make sure to update tests and documentation as appropriate.
+### Development Setup
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/AmazingFeature`
+3. Make your changes
+4. Test thoroughly
+5. Commit: `git commit -m 'Add AmazingFeature'`
+6. Push: `git push origin feature/AmazingFeature`
+7. Open a Pull Request
+
+Please update tests and documentation as appropriate.
 
 ## 📝 License
 
-This project is licensed under the MIT License - see below for details:
+This project is licensed under the MIT License.
 
 ```
 MIT License
 
-Copyright (c) 2025 cyphorlogs
+Copyright (c) 2025 RellG
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -348,16 +468,32 @@ SOFTWARE.
 ## 🙏 Credits & Acknowledgments
 
 Built with ❤️ using:
-- [Hugging Face](https://huggingface.co/) - FREE AI inference API (BART model)
+- [OpenRouter](https://openrouter.ai/) - FREE AI model API gateway
+- [Meta Llama 3.3 70B](https://ai.meta.com/llama/) - State-of-the-art language model
 - [Express.js](https://expressjs.com/) - Fast, minimalist web framework
 - [Chrome Extensions API](https://developer.chrome.com/docs/extensions/) - Browser integration
-- Design inspiration from [Discord](https://discord.com), [Claude](https://claude.ai), [X](https://x.com), and [xAI](https://x.ai)
+- Design inspiration from modern dark themes
+
+Special thanks to:
+- **Meta AI** for open-sourcing Llama models
+- **OpenRouter** for providing free access to premium models
+- **Chrome Extension Community** for excellent documentation
 
 ## 📧 Contact & Support
 
-- **Author:** cyphorlogs
-- **GitHub:** [@cyphorlogs](https://github.com/cyphorlogs)
-- **Issues:** [Report a bug](https://github.com/cyphorlogs/tldr-article-summarizer/issues)
+- **Author:** RellG
+- **Email:** tareynolds725@gmail.com
+- **GitHub:** [@RellG](https://github.com/RellG)
+- **Repository:** [tldr-article-summarizer](https://github.com/RellG/tldr-article-summarizer)
+- **Issues:** [Report a bug](https://github.com/RellG/tldr-article-summarizer/issues)
+
+## 🔗 Links
+
+- [Quick Start Guide](QUICKSTART.md) - Get running in 10 minutes
+- [Server Config](CLAUDE.md) - Server-wide documentation
+- [Releases](https://github.com/RellG/tldr-article-summarizer/releases) - Download packaged extension
+- [OpenRouter Docs](https://openrouter.ai/docs) - API documentation
+- [Llama Model Info](https://ai.meta.com/llama/) - Model details
 
 ---
 
@@ -365,6 +501,8 @@ Built with ❤️ using:
 
 **⭐ Star this repo if you find it useful!**
 
-Made with 🤖 by [Claude Code](https://claude.com/claude-code)
+**Version 2.7.0** • Made with 🤖 by [Claude Code](https://claude.com/claude-code)
+
+[⬆ Back to Top](#tldr-article-summarizer)
 
 </div>
