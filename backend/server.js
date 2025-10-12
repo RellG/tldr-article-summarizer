@@ -5,7 +5,47 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
-app.use(cors());
+
+// CORS configuration for Chrome extension
+app.use(cors({
+  origin: '*', // Allow all origins for now (will restrict to extension ID later)
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
+
+// Simple rate limiting (in-memory, per IP)
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per IP
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const userRequests = rateLimitMap.get(ip) || [];
+
+  // Remove old requests outside the window
+  const recentRequests = userRequests.filter(time => now - time < RATE_LIMIT_WINDOW);
+
+  if (recentRequests.length >= MAX_REQUESTS_PER_WINDOW) {
+    return false; // Rate limit exceeded
+  }
+
+  recentRequests.push(now);
+  rateLimitMap.set(ip, recentRequests);
+  return true;
+}
+
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, requests] of rateLimitMap.entries()) {
+    const recentRequests = requests.filter(time => now - time < RATE_LIMIT_WINDOW);
+    if (recentRequests.length === 0) {
+      rateLimitMap.delete(ip);
+    } else {
+      rateLimitMap.set(ip, recentRequests);
+    }
+  }
+}, 5 * 60 * 1000);
 
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -21,6 +61,19 @@ app.get('/health', (req, res) => {
 // Summarization endpoint
 app.post('/api/summarize', async (req, res) => {
   const startTime = Date.now();
+
+  // Get client IP for rate limiting
+  const clientIP = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+
+  // Check rate limit
+  if (!checkRateLimit(clientIP)) {
+    console.log(`[${new Date().toISOString()}] Rate limit exceeded for IP: ${clientIP}`);
+    return res.status(429).json({
+      error: 'Rate limit exceeded. Please wait a minute before trying again.',
+      retryAfter: 60
+    });
+  }
+
   try {
     const { content, url, summaryType = 'medium' } = req.body;
 
