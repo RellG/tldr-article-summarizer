@@ -2,13 +2,15 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.8.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![AI Model](https://img.shields.io/badge/AI-Llama%203.3%2070B-purple.svg)
 ![Free API](https://img.shields.io/badge/API-100%25%20FREE-brightgreen.svg)
 
 An AI-powered Chrome extension that instantly summarizes web articles using **FREE** Meta Llama 3.3 70B via OpenRouter.
+
+**🚀 NEW in v2.8:** Production-ready with centralized API at `api.terravirtual.cfd` - No setup required!
 
 [Features](#features) • [Quick Start](#quick-start) • [Installation](#installation) • [Usage](#usage) • [API](#api-endpoints)
 
@@ -52,9 +54,10 @@ An AI-powered Chrome extension that instantly summarizes web articles using **FR
 
 ### 💰 Completely FREE
 - **100% FREE AI API** via OpenRouter (Meta Llama 3.3 70B)
-- **No rate limits** on free tier
+- **No setup required** - Production API included
 - **No credit card required**
 - **Perfect for unlimited use**
+- **Production hosted** at api.terravirtual.cfd
 
 ## 📸 Screenshots
 
@@ -62,48 +65,42 @@ _Coming soon - Extension with 3D page flip animation, light/dark modes, and sett
 
 ## 🚀 Quick Start
 
-**⏱️ Get running in 10 minutes!** → See [QUICKSTART.md](QUICKSTART.md)
+**⏱️ Get running in 2 minutes!**
 
-### Prerequisites
+### Option 1: Use Production API (Easiest - v2.8+)
+
+1. **Download Extension**
+   - Download `tldr-extension-v2.8.0-production.zip` from releases
+   - Or clone this repo
+
+2. **Install in Chrome**
+   ```
+   1. Open Chrome → chrome://extensions/
+   2. Enable "Developer mode" (top right)
+   3. Click "Load unpacked"
+   4. Select extension/ folder
+   5. Done! Start summarizing immediately 🎉
+   ```
+
+**No API setup needed!** Extension uses production API at `api.terravirtual.cfd`
+
+### Option 2: Self-Host Backend (Advanced)
+
+Want to run your own server? See [QUICKSTART.md](QUICKSTART.md) for detailed setup.
+
+**Prerequisites:**
 - Linux server or local machine
 - Node.js 18+ and npm
 - Free OpenRouter account
 
-### Lightning Setup
-
-1. **Get FREE OpenRouter API Key**
-   ```bash
-   # Visit https://openrouter.ai/
-   # Sign up with GitHub/Google
-   # Create API key (starts with sk-or-v1-...)
-   ```
-
-2. **Clone & Deploy**
-   ```bash
-   git clone https://github.com/RellG/tldr-article-summarizer.git
-   cd tldr-article-summarizer/backend
-   npm install
-   ```
-
-3. **Configure**
-   ```bash
-   cat > .env << EOF
-   OPENROUTER_API_KEY=sk-or-v1-your_key_here
-   OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
-   PORT=8090
-   EOF
-   ```
-
-4. **Start Server**
-   ```bash
-   node server.js
-   # Or with PM2: pm2 start server.js --name tldr-api
-   ```
-
-5. **Install Extension**
-   - Download `tldr-extension-v2.7-final.zip`
-   - Extract and load in Chrome (`chrome://extensions/`)
-   - Configure API URL in settings: `http://your-ip:8090/api/summarize`
+**Quick setup:**
+```bash
+git clone https://github.com/RellG/tldr-article-summarizer.git
+cd tldr-article-summarizer/backend
+npm install
+# Configure .env with your OpenRouter API key
+node server.js
+```
 
 ## 📖 Usage
 
@@ -117,10 +114,9 @@ _Coming soon - Extension with 3D page flip animation, light/dark modes, and sett
 
 ### Settings
 Click the ⚙️ icon to:
-- Configure API URL
 - Switch Light/Dark mode
 - Set default summary length
-- View version info
+- View version and API info
 
 ## 🛠️ Tech Stack
 
@@ -156,7 +152,7 @@ TL;DR/
 │   └── nginx.conf.example     # Nginx reverse proxy config
 │
 └── extension/                 # Chrome Extension
-    ├── manifest.json          # Extension config v2.7.0
+    ├── manifest.json          # Extension config v2.8.0
     ├── popup.html             # Main popup UI
     ├── popup.js               # Extension logic
     ├── styles.css             # 3D animations & themes
@@ -231,7 +227,7 @@ TL;DR/
 ### Extension Installation
 
 1. **Download Extension**
-   - Download `tldr-extension-v2.7-final.zip` from releases
+   - Download `tldr-extension-v2.8.0-production.zip` from releases
    - Or use the `extension/` folder from source
 
 2. **Load in Chrome**
@@ -241,17 +237,12 @@ TL;DR/
    3. Click "Load unpacked"
    4. Select the extracted extension/ folder
    5. Purple book icon appears in toolbar!
+   6. Ready to use - no configuration needed!
    ```
 
-3. **Configure Extension**
-   ```
-   1. Click purple book icon
-   2. Click ⚙️ Settings icon
-   3. Enter API URL: http://your-server-ip:8090/api/summarize
-   4. Click "Save API URL"
-   5. Choose Light/Dark mode
-   6. Set default summary length
-   ```
+**v2.8+ Note:** Extension comes pre-configured with production API. No setup required!
+
+If self-hosting, you can modify the API URL in `popup.js` line 2.
 
 ## 🌐 Production Setup (Optional)
 
@@ -501,7 +492,7 @@ Special thanks to:
 
 **⭐ Star this repo if you find it useful!**
 
-**Version 2.7.0** • Made with 🤖 by [Claude Code](https://claude.com/claude-code)
+**Version 2.8.0** • Made with 🤖 by [Claude Code](https://claude.com/claude-code)
 
 [⬆ Back to Top](#tldr-article-summarizer)
 
