@@ -33,4 +33,5 @@ extension.zip
 # Temporary files
 *.tar.gz
 create-icons.py
-create-icons.html
+create-icons.htmlPRODUCTION-READY-STEPS.md
+FEATURE-IDEAS-V3.md
