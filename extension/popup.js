@@ -1,15 +1,9 @@
-// Configuration management
-let API_URL = '';
+// Production API URL
+const API_URL = 'https://api.terravirtual.cfd/api/summarize';
 
 // Load saved configuration on popup open
 document.addEventListener('DOMContentLoaded', async () => {
-  const result = await chrome.storage.sync.get(['apiUrl', 'theme', 'defaultSummaryType']);
-  if (result.apiUrl) {
-    API_URL = result.apiUrl;
-    document.getElementById('apiUrl').value = API_URL;
-    document.getElementById('summarizeBtn').disabled = false;
-    document.getElementById('configSection').style.display = 'none';
-  }
+  const result = await chrome.storage.sync.get(['theme', 'defaultSummaryType']);
 
   // Load theme preference
   const theme = result.theme || 'dark';
@@ -35,30 +29,6 @@ function updateThemeIcon(theme) {
   const icon = document.querySelector('.theme-icon');
   icon.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
-
-// Save configuration
-document.getElementById('saveConfig').addEventListener('click', async () => {
-  const apiUrl = document.getElementById('apiUrl').value.trim();
-
-  if (!apiUrl) {
-    showStatus('Please enter a valid API URL', 'error');
-    return;
-  }
-
-  // Validate URL format
-  try {
-    new URL(apiUrl);
-  } catch (e) {
-    showStatus('Invalid URL format', 'error');
-    return;
-  }
-
-  await chrome.storage.sync.set({ apiUrl });
-  API_URL = apiUrl;
-  document.getElementById('summarizeBtn').disabled = false;
-  document.getElementById('configSection').style.display = 'none';
-  showStatus('Configuration saved successfully!', 'success');
-});
 
 // Main summarization function
 document.getElementById('summarizeBtn').addEventListener('click', async () => {
