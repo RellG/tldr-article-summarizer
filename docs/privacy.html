@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - TL;DR Article Summarizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #8b5cf6;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .meta {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        h2 {
+            color: #7c3aed;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #6d28d9;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 20px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tldr-box {
+            background: #e0e7ff;
+            padding: 25px;
+            border-left: 4px solid #8b5cf6;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .tldr-box h2 {
+            margin-top: 0;
+            color: #6d28d9;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e5e5;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        a {
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p class="meta">
+            <strong>TL;DR Article Summarizer</strong><br>
+            Effective Date: October 12, 2025 • Last Updated: October 12, 2025
+        </p>
+
+        <h2>Introduction</h2>
+        <p>TL;DR Article Summarizer ("we", "our", or "the Extension") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our Chrome extension.</p>
+
+        <h2>Information We Collect</h2>
+
+        <h3>Article Content</h3>
+        <p>When you use the Extension to summarize an article, we collect and process:</p>
+        <ul>
+            <li><strong>Article text content</strong> that you choose to summarize</li>
+            <li><strong>Source URL</strong> of the article (optional, for reference only)</li>
+            <li><strong>Summary length preference</strong> (short, medium, or detailed)</li>
+        </ul>
+        <p>This content is sent to our API server at <code>api.terravirtual.cfd</code> for processing by our AI model (Meta Llama 3.3 70B via OpenRouter).</p>
+
+        <h3>Settings & Preferences</h3>
+        <p>We store the following locally on your device using Chrome's storage API:</p>
+        <ul>
+            <li><strong>Theme preference</strong> (dark or light mode)</li>
+            <li><strong>Default summary length</strong> preference</li>
+            <li><strong>Recent summaries cache</strong> (last 20 summaries, stored locally only)</li>
+        </ul>
+
+        <h2>Information We DO NOT Collect</h2>
+        <p>We do NOT collect, store, or track:</p>
+        <ul>
+            <li><span class="emoji">❌</span> Personal information (name, email, phone number)</li>
+            <li><span class="emoji">❌</span> Browsing history</li>
+            <li><span class="emoji">❌</span> User accounts or login credentials</li>
+            <li><span class="emoji">❌</span> Payment information</li>
+            <li><span class="emoji">❌</span> Cookies or tracking pixels</li>
+            <li><span class="emoji">❌</span> Analytics or usage statistics</li>
+            <li><span class="emoji">❌</span> IP addresses (beyond temporary rate limiting)</li>
+            <li><span class="emoji">❌</span> Device information</li>
+        </ul>
+
+        <h2>How We Use Your Information</h2>
+
+        <h3>Article Summarization</h3>
+        <ul>
+            <li>Article content is sent to our API server for AI summarization only</li>
+            <li>Content is processed by OpenRouter's AI API (Meta Llama 3.3 70B model)</li>
+            <li><strong>Content is NOT stored permanently</strong> on our servers</li>
+            <li>Content is NOT shared with third parties (except OpenRouter for processing)</li>
+            <li>Content is NOT used for training AI models</li>
+        </ul>
+
+        <h3>Rate Limiting</h3>
+        <ul>
+            <li>We temporarily store IP addresses for rate limiting purposes (10 requests/minute)</li>
+            <li>IP data is automatically deleted after 5 minutes</li>
+            <li>This prevents abuse and ensures fair usage for all users</li>
+        </ul>
+
+        <h3>Local Storage</h3>
+        <ul>
+            <li>Your settings and recent summaries are stored locally on your device only</li>
+            <li>We have NO access to this local data</li>
+            <li>You can clear this data anytime via Chrome's extension settings</li>
+        </ul>
+
+        <h2>Third-Party Services</h2>
+
+        <h3>OpenRouter API</h3>
+        <p>We use OpenRouter (<a href="https://openrouter.ai" target="_blank">https://openrouter.ai</a>) to access AI models for summarization. When you summarize an article:</p>
+        <ul>
+            <li>Article content is sent to OpenRouter's API</li>
+            <li>OpenRouter processes it using Meta Llama 3.3 70B</li>
+            <li>OpenRouter's privacy policy applies: <a href="https://openrouter.ai/privacy" target="_blank">https://openrouter.ai/privacy</a></li>
+        </ul>
+        <p><strong>Important:</strong> OpenRouter states they do NOT use customer data to train models.</p>
+
+        <h3>No Other Third Parties</h3>
+        <p>We do NOT use:</p>
+        <ul>
+            <li>Google Analytics or any analytics service</li>
+            <li>Advertising networks</li>
+            <li>Social media tracking</li>
+            <li>Third-party cookies</li>
+        </ul>
+
+        <h2>Data Storage & Retention</h2>
+
+        <h3>Server-Side</h3>
+        <ul>
+            <li>Article content is processed in real-time and NOT stored</li>
+            <li>API requests are logged temporarily for error debugging (< 24 hours)</li>
+            <li>No permanent database of user content exists</li>
+        </ul>
+
+        <h3>Client-Side (Your Device)</h3>
+        <ul>
+            <li>Theme preferences: Stored indefinitely in Chrome sync storage</li>
+            <li>Summary cache: Last 20 summaries stored locally, automatically rotated</li>
+            <li>You can clear all local data via Chrome → Settings → Extensions → TL;DR → Remove</li>
+        </ul>
+
+        <h2>Data Security</h2>
+        <p>We implement industry-standard security measures:</p>
+        <ul>
+            <li><span class="emoji">✅</span> <strong>HTTPS/TLS encryption</strong> for all API communications</li>
+            <li><span class="emoji">✅</span> <strong>Rate limiting</strong> to prevent abuse</li>
+            <li><span class="emoji">✅</span> <strong>No authentication required</strong> (no passwords to compromise)</li>
+            <li><span class="emoji">✅</span> <strong>Minimal data collection</strong> (only what's necessary)</li>
+            <li><span class="emoji">✅</span> <strong>Hosted on Railway</strong> with enterprise-grade security</li>
+        </ul>
+
+        <h2>Your Rights & Control</h2>
+        <p>You have complete control over your data:</p>
+
+        <h3>View Your Data</h3>
+        <ul>
+            <li>All stored data is on your device (Chrome storage)</li>
+            <li>View via Chrome DevTools → Application → Storage</li>
+        </ul>
+
+        <h3>Delete Your Data</h3>
+        <pre>Option 1: Clear extension data
+Chrome → Extensions → TL;DR → Remove extension
+
+Option 2: Clear storage only
+Chrome → Extensions → TL;DR → Details → Site settings → Clear data</pre>
+
+        <h3>Opt-Out</h3>
+        <p>Simply uninstall the extension to stop all data processing.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>This Extension is not directed at children under 13. We do not knowingly collect information from children. If you are a parent and believe your child has used this Extension, please contact us.</p>
+
+        <h2>Changes to Privacy Policy</h2>
+        <p>We may update this Privacy Policy occasionally. Changes will be posted with a new "Last Updated" date. Continued use of the Extension after changes constitutes acceptance.</p>
+
+        <h2>Open Source & Transparency</h2>
+        <p>This Extension is open source:</p>
+        <ul>
+            <li><strong>Source Code:</strong> <a href="https://github.com/RellG/tldr-article-summarizer" target="_blank">https://github.com/RellG/tldr-article-summarizer</a></li>
+            <li><strong>Backend Code:</strong> Publicly available in repository</li>
+            <li><strong>Audit:</strong> Anyone can review our code to verify privacy claims</li>
+        </ul>
+
+        <h2>Contact Us</h2>
+        <p>If you have questions about this Privacy Policy:</p>
+        <ul>
+            <li><strong>Email:</strong> <a href="mailto:tareynolds725@gmail.com">tareynolds725@gmail.com</a></li>
+            <li><strong>GitHub Issues:</strong> <a href="https://github.com/RellG/tldr-article-summarizer/issues" target="_blank">https://github.com/RellG/tldr-article-summarizer/issues</a></li>
+            <li><strong>Developer:</strong> RellG</li>
+        </ul>
+
+        <h2>Legal Compliance</h2>
+        <p>This Extension complies with:</p>
+        <ul>
+            <li>Chrome Web Store Developer Program Policies</li>
+            <li>General Data Protection Regulation (GDPR) principles</li>
+            <li>California Consumer Privacy Act (CCPA) principles</li>
+        </ul>
+
+        <div class="tldr-box">
+            <h2>Summary (TL;DR of Privacy Policy <span class="emoji">😊</span>)</h2>
+
+            <p><strong>What we collect:</strong></p>
+            <ul>
+                <li>Article text you choose to summarize (processed, not stored)</li>
+                <li>Your theme preference (stored on your device)</li>
+            </ul>
+
+            <p><strong>What we DON'T collect:</strong></p>
+            <ul>
+                <li>Personal information</li>
+                <li>Browsing history</li>
+                <li>Analytics or tracking data</li>
+            </ul>
+
+            <p><strong>Your data:</strong></p>
+            <ul>
+                <li>Processed in real-time, not stored permanently</li>
+                <li>Settings stored locally on your device only</li>
+                <li>You can delete everything by uninstalling</li>
+            </ul>
+
+            <p><strong>We respect your privacy. Period.</strong></p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Version:</strong> 1.0 • <strong>Effective:</strong> October 12, 2025</p>
+            <p><strong>Contact:</strong> <a href="mailto:tareynolds725@gmail.com">tareynolds725@gmail.com</a></p>
+            <p>© 2025 RellG. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
