@@ -42,6 +42,7 @@ header {
   border-bottom: 1px solid #27272a;
   position: relative;
   transition: border-color 0.3s ease;
+  z-index: 10;
 }
 
 body[data-theme="light"] header {
@@ -89,6 +90,7 @@ body[data-theme="light"] .tagline {
   right: 0;
   display: flex;
   gap: 8px;
+  z-index: 100;
 }
 
 /* Icon Buttons (Theme Toggle + Settings) */
@@ -107,6 +109,8 @@ body[data-theme="light"] .tagline {
   font-size: 18px;
   text-decoration: none;
   color: inherit;
+  position: relative;
+  z-index: 101;
 }
 
 .icon-button:hover {
