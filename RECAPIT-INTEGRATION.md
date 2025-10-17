@@ -14,7 +14,7 @@ You now have **two separate APIs** running:
 - **Port:** 8090 (local), Railway auto-port (production)
 - **Production URL:** https://api.terravirtual.cfd/api/summarize
 - **Model:** Meta Llama 3.3 70B (FREE)
-- **API Key:** `REDACTED-OPENROUTER-KEY`
+- **API Key:** Stored in `backend/.env` as `OPENROUTER_API_KEY`
 - **Purpose:** Article summarization for TL;DR Chrome extension
 - **Status:** ✅ Live in Chrome Web Store, 7+ users
 
@@ -23,7 +23,7 @@ You now have **two separate APIs** running:
 - **Port:** 8091 (local only)
 - **Local URL:** http://192.168.4.154:8091/api/summarize-media
 - **Model:** Google Gemini Flash 2.0 Exp (FREE)
-- **API Key:** `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`
+- **API Key:** Stored in `backend/.env` as `OPENROUTER_API_KEY_MEDIA`
 - **Purpose:** YouTube, podcast, video summarization for RecapIt extension
 - **Status:** 🚧 Local development, ready for integration
 
@@ -35,11 +35,11 @@ Both API keys are stored in `/home/cyphorlogs/TL;DR/backend/.env`:
 
 ```bash
 # TL;DR Extension (Articles) - Llama 3.3 70B
-OPENROUTER_API_KEY=REDACTED-OPENROUTER-KEY
+OPENROUTER_API_KEY=your-tldr-api-key-here
 OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
 
 # RecapIt Extension (Media) - Gemini Flash 2.0 Exp
-OPENROUTER_API_KEY_MEDIA=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
+OPENROUTER_API_KEY_MEDIA=your-recapit-api-key-here
 OPENROUTER_MODEL_MEDIA=google/gemini-flash-2.0-exp:free
 
 # Server Ports
@@ -49,6 +49,8 @@ PORT_MEDIA=8091
 SITE_URL=http://192.168.4.154:8090
 SITE_NAME=TL;DR Article Summarizer
 ```
+
+**⚠️ IMPORTANT:** Never commit `.env` file or API keys to public repositories!
 
 ---
 
