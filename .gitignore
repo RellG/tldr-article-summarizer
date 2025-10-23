@@ -33,7 +33,14 @@ extension.zip
 # Temporary files
 *.tar.gz
 create-icons.py
-create-icons.htmlPRODUCTION-READY-STEPS.md
+create-icons.html
+
+# Internal documentation (not for public repo)
+PRODUCTION-READY-STEPS.md
 FEATURE-IDEAS-V3.md
 SCREENSHOT-GUIDE.md
 STORE-LISTING-CONTENT.md
+RECAPIT-INTEGRATION.md
+API-DOCUMENTATION.md
+LAUNCH-CHECKLIST.md
+QWEN-RECAPIT-CONTEXT.md
