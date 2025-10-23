@@ -50,7 +50,7 @@ setInterval(() => {
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1';
-const SITE_URL = process.env.SITE_URL || 'http://192.168.4.154:8090';
+const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
 // Health check endpoint

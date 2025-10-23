@@ -50,7 +50,7 @@ setInterval(() => {
 // OpenRouter API Configuration for Media
 const OPENROUTER_API_KEY_MEDIA = process.env.OPENROUTER_API_KEY_MEDIA || process.env.OPENROUTER_API_KEY;
 const OPENROUTER_MODEL_MEDIA = process.env.OPENROUTER_MODEL_MEDIA || 'google/gemini-flash-2.0-exp:free';
-const SITE_URL = process.env.SITE_URL || 'http://192.168.4.154:8091';
+const SITE_URL = process.env.SITE_URL || 'http://localhost:8091';
 const SITE_NAME = 'RecapIt Media Summarizer';
 
 // Health check endpoint
