@@ -6,8 +6,9 @@ Add these to your Railway project's **Variables** section:
 
 ### 1. API Keys
 ```
-OPENROUTER_API_KEY=REDACTED-OPENROUTER-KEY
+OPENROUTER_API_KEY=<your-openrouter-api-key>
 ```
+**Note:** Get your API key from https://openrouter.ai/keys
 
 ### 2. AI Models (IMPORTANT!)
 ```
@@ -56,7 +57,7 @@ railway login
 railway link
 
 # Add variables
-railway variables set OPENROUTER_API_KEY=REDACTED-OPENROUTER-KEY
+railway variables set OPENROUTER_API_KEY=<your-openrouter-api-key>
 railway variables set OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
 railway variables set OPENROUTER_MODEL_ADVANCED=google/gemini-2.0-flash-exp:free
 railway variables set SITE_URL=https://tldr-article-summarizer-production.up.railway.app
@@ -127,7 +128,7 @@ Copy and paste this into Railway (adjust values as needed):
 
 ```env
 # API Keys
-OPENROUTER_API_KEY=REDACTED-OPENROUTER-KEY
+OPENROUTER_API_KEY=<your-openrouter-api-key>
 
 # AI Models (REQUIRED!)
 OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
