@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
   "name": "TL;DR Article Summarizer",
-  "version": "2.8.1",
+  "version": "2.9.1",
   "description": "Summarize articles instantly with AI-powered insights. Powered by Meta Llama 3.3 70B.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -26,5 +29,5 @@
       "description": "Open TL;DR extension"
     }
   },
-  "host_permissions": ["https://api.terravirtual.cfd/*"]
+  "host_permissions": ["https://tldr-article-summarizer-production.up.railway.app/*"]
 }

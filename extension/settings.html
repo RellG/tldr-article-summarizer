@@ -4,102 +4,147 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TL;DR Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
-      width: 500px;
-      min-height: 400px;
+      width: 600px;
+      min-height: 500px;
     }
 
     .settings-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 25px;
+      gap: 12px;
+      margin-bottom: 28px;
     }
 
     .back-button {
       width: 36px;
       height: 36px;
-      padding: 8px;
-      background: #27272a;
-      border: 1px solid #3f3f46;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-secondary);
       text-decoration: none;
-      color: #e4e4e7;
+      font-size: 20px;
+      font-weight: 600;
     }
 
     .back-button:hover {
-      background: #3f3f46;
+      background: var(--bg-tertiary);
+      border-color: var(--border-hover);
+      transform: translateX(-2px);
     }
 
-    body[data-theme="light"] .back-button {
-      background: #e9ecef;
-      border: 1px solid #ced4da;
-      color: #212529;
+    .settings-title {
+      flex: 1;
     }
 
-    body[data-theme="light"] .back-button:hover {
-      background: #dee2e6;
+    .settings-title h1 {
+      font-size: 24px;
+      margin-bottom: 4px;
     }
 
     .settings-section {
-      background: #18181b;
-      padding: 18px;
-      border-radius: 10px;
+      background: var(--bg-secondary);
+      padding: 20px;
+      border-radius: var(--radius-lg);
       margin-bottom: 16px;
-      border: 1px solid #27272a;
-    }
-
-    body[data-theme="light"] .settings-section {
-      background: #ffffff;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--border);
     }
 
     .settings-section h3 {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
-      margin-bottom: 12px;
-      color: #a78bfa;
-    }
-
-    body[data-theme="light"] .settings-section h3 {
-      color: #7c3aed;
+      margin-bottom: 8px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .settings-section p {
-      font-size: 12px;
-      color: #a1a1aa;
-      margin-bottom: 12px;
-      line-height: 1.5;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.6;
     }
 
-    body[data-theme="light"] .settings-section p {
-      color: #6c757d;
+    .settings-section label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
     }
 
     .save-success {
-      padding: 12px;
-      background: rgba(34, 197, 94, 0.1);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      border-radius: 8px;
-      font-size: 12px;
-      text-align: center;
       display: none;
-      margin-top: 15px;
+      padding: 12px 16px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 16px;
+      animation: slideDown 0.3s ease;
     }
 
-    body[data-theme="light"] .save-success {
-      background: rgba(40, 167, 69, 0.1);
-      color: #28a745;
-      border-color: rgba(40, 167, 69, 0.3);
+    .save-success.visible {
+      display: block;
+    }
+
+    .about-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .about-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-item:last-child {
+      border-bottom: none;
+    }
+
+    .about-label {
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .about-value {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .about-value a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .about-value a:hover {
+      text-decoration: underline;
+    }
+
+    .section-icon {
+      font-size: 18px;
     }
   </style>
 </head>
@@ -107,48 +152,75 @@
   <div class="container">
     <header>
       <div class="settings-header">
-        <a href="popup.html" class="back-button" title="Back to main">←</a>
-        <div class="logo-text">
-          <h1 style="font-size: 24px;">Settings</h1>
-          <p class="tagline">Configure your extension</p>
+        <a href="popup.html" class="back-button" title="Back to main" aria-label="Back">←</a>
+        <div class="settings-title">
+          <h1>Settings</h1>
+          <p class="tagline">Configure your preferences</p>
         </div>
       </div>
     </header>
 
     <!-- Theme Settings -->
     <div class="settings-section">
-      <h3>🎨 Appearance</h3>
-      <p>Choose your preferred color theme.</p>
-      <label for="themeSelect">Theme:</label>
-      <select id="themeSelect">
+      <h3><span class="section-icon">🎨</span> Appearance</h3>
+      <p>Choose your preferred theme and color scheme.</p>
+
+      <label for="themeSelect">Theme</label>
+      <select id="themeSelect" class="select-input">
         <option value="dark">Dark Mode</option>
         <option value="light">Light Mode</option>
+      </select>
+
+      <label for="colorSelect" style="margin-top: 12px;">Color Scheme</label>
+      <select id="colorSelect" class="select-input">
+        <option value="purple">Purple (Original)</option>
+        <option value="green">Emerald Green</option>
+        <option value="blue">Ocean Blue</option>
+        <option value="mono">Monochrome</option>
       </select>
     </div>
 
     <!-- Default Summary Type -->
     <div class="settings-section">
-      <h3>📝 Default Summary Length</h3>
-      <p>Set the default summary length when opening the extension.</p>
-      <label for="defaultSummaryType">Default Length:</label>
-      <select id="defaultSummaryType">
-        <option value="short">Short</option>
-        <option value="medium">Medium</option>
-        <option value="detailed">Detailed</option>
+      <h3><span class="section-icon">📏</span> Default Summary Length</h3>
+      <p>Set the default length when opening the extension.</p>
+      <label for="defaultSummaryType">Default Length</label>
+      <select id="defaultSummaryType" class="select-input">
+        <option value="short">Short (2-3 sentences)</option>
+        <option value="medium">Medium (3-5 sentences)</option>
+        <option value="detailed">Detailed (7-10 sentences)</option>
       </select>
     </div>
 
     <!-- About -->
     <div class="settings-section">
-      <h3>ℹ️ About</h3>
-      <p><strong>TL;DR Article Summarizer</strong></p>
-      <p><strong>Version:</strong> 2.8.1</p>
-      <p><strong>AI Model:</strong> Meta Llama 3.3 70B (70B parameters)</p>
-      <p><strong>Provider:</strong> OpenRouter</p>
-      <p><strong>License:</strong> MIT License</p>
-      <p><strong>Developer:</strong> RellG</p>
-      <p><strong>Support:</strong> <a href="https://github.com/RellG/tldr-article-summarizer" target="_blank" style="color: #8b5cf6;">GitHub</a></p>
-      <p style="margin-bottom: 0;"><strong>Privacy Policy:</strong> <a href="https://rellg.github.io/tldr-article-summarizer/privacy.html" target="_blank" style="color: #8b5cf6;">View Policy</a></p>
+      <h3><span class="section-icon">ℹ️</span> About</h3>
+      <div class="about-grid">
+        <div class="about-item">
+          <span class="about-label">Version</span>
+          <span class="about-value">2.9.1</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">AI Model</span>
+          <span class="about-value">Llama 3.3 70B</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Developer</span>
+          <span class="about-value">RellG</span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">GitHub</span>
+          <span class="about-value">
+            <a href="https://github.com/RellG/tldr-article-summarizer" target="_blank">View Repository</a>
+          </span>
+        </div>
+        <div class="about-item">
+          <span class="about-label">Privacy Policy</span>
+          <span class="about-value">
+            <a href="https://rellg.github.io/tldr-article-summarizer/privacy.html" target="_blank">View Policy</a>
+          </span>
+        </div>
+      </div>
     </div>
 
     <div id="saveSuccess" class="save-success">Settings saved successfully!</div>

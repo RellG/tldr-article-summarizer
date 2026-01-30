@@ -1,19 +1,57 @@
 // Production API URL
-const API_URL = 'https://api.terravirtual.cfd/api/summarize';
+const API_URL = 'https://tldr-article-summarizer-production.up.railway.app/api/summarize';
 
-// Load saved configuration on popup open
+// Global state
+let contextMenuData = null;
+
+// Load saved configuration and check for context menu action
 document.addEventListener('DOMContentLoaded', async () => {
-  const result = await chrome.storage.sync.get(['theme', 'defaultSummaryType']);
-
   // Load theme preference
+  const result = await chrome.storage.sync.get(['theme', 'colorScheme', 'defaultSummaryType']);
+
   const theme = result.theme || 'dark';
   document.body.setAttribute('data-theme', theme);
   updateThemeIcon(theme);
 
+  // Load color scheme
+  const colorScheme = result.colorScheme || 'purple';
+  document.body.setAttribute('data-color', colorScheme);
+
   // Load default summary type
   const defaultSummaryType = result.defaultSummaryType || 'medium';
   document.getElementById('summaryType').value = defaultSummaryType;
+
+  // Check if opened from context menu
+  await checkContextMenuAction();
 });
+
+// Check for context menu action
+async function checkContextMenuAction() {
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'getContextMenuAction' });
+
+    if (response && response.text) {
+      contextMenuData = response;
+
+      // Show context alert
+      const alert = document.getElementById('contextAlert');
+      const alertText = document.getElementById('contextAlertText');
+
+      alertText.textContent = 'Ready to summarize selection';
+      alert.style.display = 'block';
+
+      // Auto-trigger summarization after a brief delay
+      setTimeout(() => {
+        document.getElementById('summarizeBtn').click();
+      }, 800);
+
+      // Clear the context menu action
+      await chrome.storage.local.remove('contextMenuAction');
+    }
+  } catch (error) {
+    console.log('No context menu action:', error);
+  }
+}
 
 // Theme toggle
 document.getElementById('themeToggle').addEventListener('click', async () => {
@@ -26,8 +64,8 @@ document.getElementById('themeToggle').addEventListener('click', async () => {
 });
 
 function updateThemeIcon(theme) {
-  const icon = document.querySelector('.theme-icon');
-  icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  const themeIcon = document.querySelector('.theme-icon use');
+  themeIcon.setAttribute('href', theme === 'dark' ? '#icon-sun' : '#icon-moon');
 }
 
 // Main summarization function
@@ -42,39 +80,53 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
   summaryDiv.classList.remove('visible');
   actionsDiv.style.display = 'none';
   hideStatus();
-  showProgress(20, 'Extracting article content...');
+  showLoading('Analyzing article...');
 
   try {
-    // Get the current tab
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let content;
+    let tab;
 
-    // Extract article content from the page
-    const results = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: extractArticleContent
-    });
+    // Check if we have content from context menu
+    if (contextMenuData && contextMenuData.text) {
+      content = contextMenuData.text;
+      contextMenuData = null; // Clear after use
 
-    const content = results[0].result;
+      // Get current tab for URL
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      tab = tabs[0];
+    } else {
+      // Get the current tab
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      tab = tabs[0];
+
+      // Extract article content from the page
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: extractArticleContent
+      });
+
+      content = results[0].result;
+    }
 
     if (!content || content.length < 100) {
-      hideProgress();
-      showStatus('No article content found on this page. Try a different page with more text.', 'error');
+      hideLoading();
+      showStatus('No article content found on this page. Try selecting text or visit an article page.', 'error');
       button.disabled = false;
       return;
     }
 
-    showProgress(40, 'Preparing content for AI...');
+    updateLoadingText('Preparing content for AI...');
 
     // Calculate word count and reading time
     const wordCount = content.trim().split(/\s+/).length;
-    const readingTime = Math.ceil(wordCount / 200); // ~200 words per minute
+    const readingTime = Math.ceil(wordCount / 200);
 
-    await sleep(300); // Brief pause for UX
-    showProgress(60, 'AI is analyzing...');
+    await sleep(300);
+    updateLoadingText('AI is analyzing...');
 
     // Send to API with timeout handling
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     let response;
     try {
@@ -97,7 +149,7 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
       throw fetchError;
     }
 
-    showProgress(90, 'Generating summary...');
+    updateLoadingText('Generating summary...');
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
@@ -109,7 +161,7 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
       const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
 
       summaryDiv.innerHTML = `
-        <strong>Summary:</strong><br>
+        <strong>Summary</strong>
         ${formatSummary(data.summary)}
         <div class="meta-info">
           <div class="meta-item">📄 ${wordCount} words</div>
@@ -118,42 +170,63 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
         </div>
       `;
 
-      showProgress(100, 'Complete!');
-      await sleep(500);
-      hideProgress();
-
+      hideLoading();
       summaryDiv.classList.add('visible');
-      actionsDiv.style.display = 'block';
+      actionsDiv.style.display = 'grid';
 
-      // Store the last summary for copy functionality and caching
+      // Store the last summary for copy functionality
       summaryDiv.dataset.rawSummary = data.summary;
 
       // Cache the summary
       await cacheSummary(tab.url, data.summary, wordCount, readingTime);
     } else {
-      hideProgress();
+      hideLoading();
       showStatus('Failed to generate summary. Please try again.', 'error');
     }
 
   } catch (error) {
     console.error('Error:', error);
-    hideProgress();
+    hideLoading();
     showStatus(`Error: ${error.message}`, 'error');
   }
 
   button.disabled = false;
 });
 
-// Copy to clipboard
-document.getElementById('copyBtn').addEventListener('click', () => {
+// Format summary with better HTML rendering
+function formatSummary(summary) {
+  return summary
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+// Copy to clipboard with animation
+document.getElementById('copyBtn').addEventListener('click', async () => {
   const summaryDiv = document.getElementById('summary');
   const summary = summaryDiv.dataset.rawSummary;
+  const copyBtn = document.getElementById('copyBtn');
+  const copyIcon = copyBtn.querySelector('.icon-copy-btn use');
 
-  navigator.clipboard.writeText(summary).then(() => {
+  try {
+    await navigator.clipboard.writeText(summary);
+
+    // Success animation
+    copyBtn.classList.add('copied');
+    copyIcon.setAttribute('href', '#icon-check');
+
     showStatus('Copied to clipboard!', 'success');
-  }).catch(err => {
+
+    // Reset after animation
+    setTimeout(() => {
+      copyBtn.classList.remove('copied');
+      copyIcon.setAttribute('href', '#icon-copy');
+    }, 2000);
+
+  } catch (err) {
     showStatus('Failed to copy to clipboard', 'error');
-  });
+  }
 });
 
 // Clear summary
@@ -161,6 +234,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   document.getElementById('summary').classList.remove('visible');
   document.getElementById('actions').style.display = 'none';
   document.getElementById('status').style.display = 'none';
+  document.getElementById('contextAlert').style.display = 'none';
 });
 
 // Helper function to show status messages
@@ -182,20 +256,23 @@ function hideStatus() {
   document.getElementById('status').style.display = 'none';
 }
 
-// Helper function to show progress
-function showProgress(percentage, message) {
-  const container = document.getElementById('progressContainer');
-  const fill = document.getElementById('progressFill');
-  const text = document.getElementById('progressText');
-
+// Show loading with typing animation
+function showLoading(message) {
+  const container = document.getElementById('loadingContainer');
+  const text = document.getElementById('loadingText');
+  text.textContent = message;
   container.classList.add('visible');
-  fill.style.width = `${percentage}%`;
+}
+
+// Update loading text
+function updateLoadingText(message) {
+  const text = document.getElementById('loadingText');
   text.textContent = message;
 }
 
-// Helper function to hide progress
-function hideProgress() {
-  const container = document.getElementById('progressContainer');
+// Hide loading
+function hideLoading() {
+  const container = document.getElementById('loadingContainer');
   container.classList.remove('visible');
 }
 
@@ -227,16 +304,6 @@ async function cacheSummary(url, summary, wordCount, readingTime) {
   } catch (error) {
     console.error('Failed to cache summary:', error);
   }
-}
-
-// Format summary with better HTML rendering
-function formatSummary(summary) {
-  // Convert markdown-style bullet points to HTML
-  return summary
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
 // This function runs in the page context to extract article content
@@ -284,7 +351,7 @@ function extractArticleContent() {
   const paragraphs = document.querySelectorAll('p');
   const paragraphText = Array.from(paragraphs)
     .map(p => p.innerText.trim())
-    .filter(text => text.length > 50) // Filter out short paragraphs
+    .filter(text => text.length > 50)
     .join('\n\n');
 
   if (paragraphText.length > 200) {
@@ -294,7 +361,6 @@ function extractArticleContent() {
   // Strategy 4: Last resort - get body text but try to filter out navigation
   const body = document.body;
   if (body) {
-    // Remove nav, header, footer, aside elements temporarily
     const exclude = body.querySelectorAll('nav, header, footer, aside, .sidebar, .menu');
     const originalDisplay = [];
     exclude.forEach((el, i) => {

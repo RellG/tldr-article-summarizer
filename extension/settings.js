@@ -1,11 +1,16 @@
 // Load settings on page load
 document.addEventListener('DOMContentLoaded', async () => {
-  const result = await chrome.storage.sync.get(['theme', 'defaultSummaryType']);
+  const result = await chrome.storage.sync.get(['theme', 'colorScheme', 'defaultSummaryType']);
 
   // Load theme
   const theme = result.theme || 'dark';
   document.body.setAttribute('data-theme', theme);
   document.getElementById('themeSelect').value = theme;
+
+  // Load color scheme
+  const colorScheme = result.colorScheme || 'purple';
+  document.body.setAttribute('data-color', colorScheme);
+  document.getElementById('colorSelect').value = colorScheme;
 
   // Load default summary type
   const defaultSummaryType = result.defaultSummaryType || 'medium';
@@ -20,6 +25,14 @@ document.getElementById('themeSelect').addEventListener('change', async (e) => {
   showSuccess();
 });
 
+// Color scheme change (NEW)
+document.getElementById('colorSelect').addEventListener('change', async (e) => {
+  const colorScheme = e.target.value;
+  document.body.setAttribute('data-color', colorScheme);
+  await chrome.storage.sync.set({ colorScheme });
+  showSuccess();
+});
+
 // Default summary type change
 document.getElementById('defaultSummaryType').addEventListener('change', async (e) => {
   const defaultSummaryType = e.target.value;
@@ -27,11 +40,12 @@ document.getElementById('defaultSummaryType').addEventListener('change', async (
   showSuccess();
 });
 
-// Show success message
+// Show success message with animation
 function showSuccess() {
   const successDiv = document.getElementById('saveSuccess');
-  successDiv.style.display = 'block';
+  successDiv.classList.add('visible');
+
   setTimeout(() => {
-    successDiv.style.display = 'none';
+    successDiv.classList.remove('visible');
   }, 3000);
 }

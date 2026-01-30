@@ -4,114 +4,148 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TL;DR Summarizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- SVG Icon Definitions -->
+  <svg style="display: none;">
+    <defs>
+      <!-- Sun Icon -->
+      <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </symbol>
+
+      <!-- Moon Icon -->
+      <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </symbol>
+
+      <!-- Settings Icon -->
+      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v6m0 6v6m5.196-14.196l-4.242 4.242m0 5.656l-4.242 4.242M23 12h-6m-6 0H1m14.196 5.196l-4.242-4.242m0-5.656l-4.242-4.242"/>
+      </symbol>
+
+      <!-- Sparkles Icon -->
+      <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 3l1.545 4.635L18.18 9.18l-4.635 1.545L12 15.36l-1.545-4.635L5.82 9.18l4.635-1.545L12 3z"/>
+        <path d="M20 3v4m-2-2h4M6 16v4m-2-2h4"/>
+      </symbol>
+
+      <!-- Copy Icon -->
+      <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </symbol>
+
+      <!-- Check Icon -->
+      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </symbol>
+
+      <!-- Trash Icon -->
+      <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <div class="container">
     <header>
       <div class="header-actions">
-        <button id="themeToggle" class="icon-button" title="Toggle dark/light mode">
-          <span class="theme-icon">☀️</span>
+        <button id="themeToggle" class="icon-button" title="Toggle dark/light mode" aria-label="Toggle theme">
+          <svg class="icon theme-icon">
+            <use href="#icon-sun"></use>
+          </svg>
         </button>
-        <a href="settings.html" class="icon-button" title="Settings">
-          <span>⚙️</span>
+        <a href="settings.html" class="icon-button" title="Settings" aria-label="Settings">
+          <svg class="icon">
+            <use href="#icon-settings"></use>
+          </svg>
         </a>
       </div>
-      <div class="logo-text-centered">
+      <div class="logo-section">
         <h1>TL;DR</h1>
         <p class="tagline">AI Article Summarizer</p>
       </div>
     </header>
 
-    <div class="settings">
-      <label for="summaryType">Summary Length:</label>
-      <select id="summaryType">
-        <option value="short">Short</option>
-        <option value="medium" selected>Medium</option>
-        <option value="detailed">Detailed</option>
-      </select>
+    <!-- Context Menu Alert (shown when triggered from right-click) -->
+    <div id="contextAlert" class="context-alert" style="display: none;">
+      <div class="context-alert-content">
+        <span class="context-alert-icon">✨</span>
+        <span id="contextAlertText">Ready to summarize selection</span>
+      </div>
+    </div>
+
+    <div class="controls-section">
+      <!-- Summary Length -->
+      <div class="control-group">
+        <label for="summaryType">Length</label>
+        <select id="summaryType" class="select-input">
+          <option value="short">Short (2-3 sentences)</option>
+          <option value="medium" selected>Medium (3-5 sentences)</option>
+          <option value="detailed">Detailed (7-10 sentences)</option>
+        </select>
+      </div>
     </div>
 
     <button id="summarizeBtn" class="btn-primary">
-      <span class="btn-icon">✨</span>
-      <span class="btn-text">Summarize This Article</span>
+      <svg class="btn-icon">
+        <use href="#icon-sparkles"></use>
+      </svg>
+      <span class="btn-text">Summarize Article</span>
     </button>
 
-    <div id="progressContainer" class="progress-container">
-      <!-- Animated Open Book with Flipping Pages -->
-      <div class="book-wrapper">
-        <div class="open-book">
-          <!-- Left side of book -->
-          <div class="book-left-side">
-            <div class="book-page-content">
-              <div class="page-text-lines">
-                <span></span><span></span><span></span>
-                <span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right side with flipping pages -->
-          <div class="book-right-side">
-            <div class="flipping-page page-flip-1">
-              <div class="page-front">
-                <div class="page-text-lines">
-                  <span></span><span></span><span></span>
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-              <div class="page-back"></div>
-            </div>
-            <div class="flipping-page page-flip-2">
-              <div class="page-front">
-                <div class="page-text-lines">
-                  <span></span><span></span><span></span>
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-              <div class="page-back"></div>
-            </div>
-            <div class="flipping-page page-flip-3">
-              <div class="page-front">
-                <div class="page-text-lines">
-                  <span></span><span></span><span></span>
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-              <div class="page-back"></div>
-            </div>
-            <div class="book-page-content">
-              <div class="page-text-lines">
-                <span></span><span></span><span></span>
-                <span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Loading State -->
+    <div id="loadingContainer" class="loading-container">
+      <div class="typing-indicator">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
       </div>
-
-      <!-- Progress Bar -->
-      <div class="progress-bar">
-        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
-      </div>
-      <div id="progressText" class="progress-text">Analyzing article...</div>
+      <div id="loadingText" class="loading-text">Analyzing article...</div>
     </div>
 
+    <!-- Status Messages -->
     <div id="status" class="status"></div>
 
-    <div id="summary" class="summary-container"></div>
+    <!-- Summary Display -->
+    <div id="summary" class="summary-card"></div>
 
+    <!-- Action Buttons -->
     <div class="actions" id="actions" style="display: none;">
       <button id="copyBtn" class="btn-secondary">
-        <span class="btn-icon">📋</span> Copy
+        <svg class="btn-icon icon-copy-btn">
+          <use href="#icon-copy"></use>
+        </svg>
+        <span>Copy</span>
       </button>
       <button id="clearBtn" class="btn-secondary">
-        <span class="btn-icon">🗑️</span> Clear
+        <svg class="btn-icon">
+          <use href="#icon-trash"></use>
+        </svg>
+        <span>Clear</span>
       </button>
     </div>
 
-    <footer class="extension-footer">
-      <div class="footer-tip">💡 Press Ctrl+Shift+S for quick summarize</div>
+    <footer class="footer">
+      <div class="footer-tip">
+        <span class="tip-icon">💡</span>
+        <span>Press Ctrl+Shift+S or right-click any text</span>
+      </div>
     </footer>
   </div>
 

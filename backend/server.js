@@ -49,7 +49,7 @@ setInterval(() => {
 
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
@@ -96,18 +96,23 @@ app.post('/api/summarize', async (req, res) => {
     console.log(`[${new Date().toISOString()}] Truncated to ${truncatedContent.length} chars`);
 
     // Build prompt based on summary type
-    let prompt;
+    let lengthInstruction;
     switch(summaryType) {
       case 'short':
-        prompt = `Summarize the following article in 2-3 concise sentences:\n\n${truncatedContent}`;
+        lengthInstruction = '2-3 sentences';
         break;
       case 'detailed':
-        prompt = `Provide a detailed summary of the following article in 7-10 sentences, covering all key points:\n\n${truncatedContent}`;
+        lengthInstruction = '7-10 sentences';
         break;
       case 'medium':
       default:
-        prompt = `Summarize the following article in 3-5 clear sentences, capturing the main points:\n\n${truncatedContent}`;
+        lengthInstruction = '3-5 sentences';
     }
+
+    const systemPrompt = 'You are a helpful assistant that creates clear, concise summaries of articles in paragraph form.';
+    const prompt = `Summarize the following article in ${lengthInstruction}, capturing the main points:\n\n${truncatedContent}`;
+
+    console.log(`[${new Date().toISOString()}] Using model: ${OPENROUTER_MODEL}`);
 
     // Call OpenRouter API with timeout
     const controller = new AbortController();
@@ -130,7 +135,7 @@ app.post('/api/summarize', async (req, res) => {
             messages: [
               {
                 role: 'system',
-                content: 'You are a helpful assistant that creates clear, concise summaries of articles. Provide summaries in paragraph form without bullet points.'
+                content: systemPrompt
               },
               {
                 role: 'user',
@@ -138,7 +143,7 @@ app.post('/api/summarize', async (req, res) => {
               }
             ],
             temperature: 0.3,
-            max_tokens: 400
+            max_tokens: 500
           }),
           signal: controller.signal
         }
