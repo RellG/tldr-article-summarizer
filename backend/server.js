@@ -49,18 +49,18 @@ setInterval(() => {
 
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1-0528:free';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
 // Fallback models in order of preference (all free tier)
-// Updated 2026-02-05 with valid OpenRouter free model IDs
+// Updated 2026-02-05 - DeepSeek R1 primary (better availability than Llama)
 const FALLBACK_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',    // Primary - best quality
-  'deepseek/deepseek-r1-0528:free',            // DeepSeek R1 - excellent reasoning
-  'qwen/qwen3-coder:free',                      // Qwen 3 - good for text
-  'nvidia/nemotron-3-nano-30b-a3b:free',       // NVIDIA Nemotron - reliable
-  'stepfun/step-3.5-flash:free'                // Step AI Flash - fast
+  'deepseek/deepseek-r1-0528:free',            // Primary - excellent summarization, reliable
+  'qwen/qwen3-coder:free',                      // Qwen 3 - fast, clean summaries
+  'stepfun/step-3.5-flash:free',               // Step AI Flash - very fast
+  'nvidia/nemotron-3-nano-30b-a3b:free',       // NVIDIA Nemotron - reliable fallback
+  'meta-llama/llama-3.3-70b-instruct:free'     // Llama - moved to last (rate limited)
 ];
 
 // Health check endpoint
