@@ -54,12 +54,13 @@ const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
 // Fallback models in order of preference (all free tier)
+// Updated 2026-02-05 with valid OpenRouter free model IDs
 const FALLBACK_MODELS = [
   'meta-llama/llama-3.3-70b-instruct:free',    // Primary - best quality
-  'google/gemma-2-9b-it:free',                  // Google Gemma 2 - good quality
-  'mistralai/mistral-7b-instruct:free',         // Mistral 7B - fast and reliable
-  'qwen/qwen-2-7b-instruct:free',               // Qwen 2 - good alternative
-  'microsoft/phi-3-mini-128k-instruct:free'     // Phi-3 - Microsoft's efficient model
+  'deepseek/deepseek-r1-0528:free',            // DeepSeek R1 - excellent reasoning
+  'qwen/qwen3-coder:free',                      // Qwen 3 - good for text
+  'nvidia/nemotron-3-nano-30b-a3b:free',       // NVIDIA Nemotron - reliable
+  'stepfun/step-3.5-flash:free'                // Step AI Flash - fast
 ];
 
 // Health check endpoint
