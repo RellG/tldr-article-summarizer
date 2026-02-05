@@ -53,6 +53,15 @@ const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-7
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
+// Fallback models in order of preference (all free tier)
+const FALLBACK_MODELS = [
+  'meta-llama/llama-3.3-70b-instruct:free',    // Primary - best quality
+  'google/gemma-2-9b-it:free',                  // Google Gemma 2 - good quality
+  'mistralai/mistral-7b-instruct:free',         // Mistral 7B - fast and reliable
+  'qwen/qwen-2-7b-instruct:free',               // Qwen 2 - good alternative
+  'microsoft/phi-3-mini-128k-instruct:free'     // Phi-3 - Microsoft's efficient model
+];
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -112,59 +121,89 @@ app.post('/api/summarize', async (req, res) => {
     const systemPrompt = 'You are a helpful assistant that creates clear, concise summaries of articles in paragraph form.';
     const prompt = `Summarize the following article in ${lengthInstruction}, capturing the main points:\n\n${truncatedContent}`;
 
-    console.log(`[${new Date().toISOString()}] Using model: ${OPENROUTER_MODEL}`);
+    // Try models with fallback on rate limit (429) errors
+    let result = null;
+    let usedModel = OPENROUTER_MODEL;
+    let lastError = null;
 
-    // Call OpenRouter API with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+    // Build list of models to try (primary first, then fallbacks)
+    const modelsToTry = [OPENROUTER_MODEL, ...FALLBACK_MODELS.filter(m => m !== OPENROUTER_MODEL)];
 
-    let response;
-    try {
-      response = await fetch(
-        'https://openrouter.ai/api/v1/chat/completions',
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': SITE_URL,
-            'X-Title': SITE_NAME
-          },
-          body: JSON.stringify({
-            model: OPENROUTER_MODEL,
-            messages: [
-              {
-                role: 'system',
-                content: systemPrompt
-              },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ],
-            temperature: 0.3,
-            max_tokens: 500
-          }),
-          signal: controller.signal
+    for (const model of modelsToTry) {
+      console.log(`[${new Date().toISOString()}] Trying model: ${model}`);
+
+      // Call OpenRouter API with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+
+      let response;
+      try {
+        response = await fetch(
+          'https://openrouter.ai/api/v1/chat/completions',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': SITE_URL,
+              'X-Title': SITE_NAME
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                {
+                  role: 'system',
+                  content: systemPrompt
+                },
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ],
+              temperature: 0.3,
+              max_tokens: 500
+            }),
+            signal: controller.signal
+          }
+        );
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          lastError = new Error('Request timed out. Try with a shorter article or different summary type.');
+          continue; // Try next model
         }
-      );
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-      if (fetchError.name === 'AbortError') {
-        throw new Error('Request timed out. Try with a shorter article or different summary type.');
+        lastError = fetchError;
+        continue; // Try next model
+      } finally {
+        clearTimeout(timeoutId);
       }
-      throw fetchError;
-    } finally {
-      clearTimeout(timeoutId);
+
+      // Check for rate limit (429) - try next model
+      if (response.status === 429) {
+        const errorText = await response.text();
+        console.log(`[${new Date().toISOString()}] Model ${model} rate limited (429), trying next...`);
+        lastError = new Error(`Rate limited: ${model}`);
+        continue; // Try next model
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenRouter API error:', response.status, errorText);
+        lastError = new Error(`API request failed: ${response.status}`);
+        continue; // Try next model
+      }
+
+      // Success! Parse result and break
+      result = await response.json();
+      usedModel = model;
+      console.log(`[${new Date().toISOString()}] Success with model: ${model}`);
+      break;
     }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenRouter API error:', response.status, errorText);
-      throw new Error(`API request failed: ${response.status}`);
+    // If all models failed, throw the last error
+    if (!result) {
+      throw lastError || new Error('All models failed. Please try again later.');
     }
-
-    const result = await response.json();
 
     // Extract summary from response
     const summary = result.choices?.[0]?.message?.content || 'Unable to generate summary';
@@ -178,7 +217,7 @@ app.post('/api/summarize', async (req, res) => {
       summaryLength: summary.length,
       url,
       timestamp: new Date().toISOString(),
-      model: OPENROUTER_MODEL
+      model: usedModel
     });
 
   } catch (error) {
