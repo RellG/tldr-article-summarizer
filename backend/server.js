@@ -49,18 +49,18 @@ setInterval(() => {
 
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1-0528:free';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b:free';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
-// Fallback models in order of preference (all free tier)
-// Updated 2026-02-05 - DeepSeek R1 primary (better availability than Llama)
+// Fallback models - prioritized by SPEED (no reasoning models)
+// Updated 2026-02-06 - Fast models only, no slow reasoning models like R1
 const FALLBACK_MODELS = [
-  'deepseek/deepseek-r1-0528:free',            // Primary - excellent summarization, reliable
-  'qwen/qwen3-coder:free',                      // Qwen 3 - fast, clean summaries
-  'stepfun/step-3.5-flash:free',               // Step AI Flash - very fast
-  'nvidia/nemotron-3-nano-30b-a3b:free',       // NVIDIA Nemotron - reliable fallback
-  'meta-llama/llama-3.3-70b-instruct:free'     // Llama - moved to last (rate limited)
+  'qwen/qwen3-235b-a22b:free',                 // Primary - Qwen 3 235B, fast & high quality
+  'qwen/qwen3-30b-a3b:free',                   // Qwen 3 30B - very fast
+  'meta-llama/llama-3.3-70b-instruct:free',    // Llama 3.3 - good when available
+  'nvidia/llama-3.1-nemotron-70b-instruct:free', // NVIDIA Nemotron - reliable
+  'mistralai/mistral-small-3.1-24b-instruct:free' // Mistral Small - fast fallback
 ];
 
 // Health check endpoint
