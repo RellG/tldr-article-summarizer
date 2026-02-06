@@ -49,18 +49,17 @@ setInterval(() => {
 
 // OpenRouter API Configuration
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b:free';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
-// Fallback models - prioritized by SPEED (no reasoning models)
-// Updated 2026-02-06 - Fast models only, no slow reasoning models like R1
+// Fallback models - verified working on OpenRouter (2026-02-06)
 const FALLBACK_MODELS = [
-  'qwen/qwen3-235b-a22b:free',                 // Primary - Qwen 3 235B, fast & high quality
-  'qwen/qwen3-30b-a3b:free',                   // Qwen 3 30B - very fast
-  'meta-llama/llama-3.3-70b-instruct:free',    // Llama 3.3 - good when available
-  'nvidia/llama-3.1-nemotron-70b-instruct:free', // NVIDIA Nemotron - reliable
-  'mistralai/mistral-small-3.1-24b-instruct:free' // Mistral Small - fast fallback
+  'meta-llama/llama-3.3-70b-instruct:free',    // Primary - fast 4-6s, high quality
+  'nvidia/llama-3.1-nemotron-70b-instruct:free', // NVIDIA Nemotron
+  'deepseek/deepseek-chat:free',               // DeepSeek Chat (NOT R1 reasoning)
+  'google/gemma-2-9b-it:free',                 // Google Gemma 2
+  'microsoft/phi-3-medium-128k-instruct:free'  // Microsoft Phi-3
 ];
 
 // Health check endpoint
