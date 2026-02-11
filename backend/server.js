@@ -53,13 +53,13 @@ const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-7
 const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
 const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
 
-// Fallback models - verified working on OpenRouter (2026-02-06)
+// Fallback models - verified working on OpenRouter (2026-02-11)
 const FALLBACK_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',    // Primary - fast 4-6s, high quality
-  'nvidia/llama-3.1-nemotron-70b-instruct:free', // NVIDIA Nemotron
-  'deepseek/deepseek-chat:free',               // DeepSeek Chat (NOT R1 reasoning)
-  'google/gemma-2-9b-it:free',                 // Google Gemma 2
-  'microsoft/phi-3-medium-128k-instruct:free'  // Microsoft Phi-3
+  'meta-llama/llama-3.3-70b-instruct:free',       // Primary - high quality
+  'google/gemma-3-27b-it:free',                    // Fast, reliable fallback
+  'mistralai/mistral-small-3.1-24b-instruct:free', // Mistral Small 3.1
+  'nousresearch/hermes-3-llama-3.1-405b:free',     // Large model fallback
+  'meta-llama/llama-3.2-3b-instruct:free'          // Lightweight last resort
 ];
 
 // Health check endpoint
