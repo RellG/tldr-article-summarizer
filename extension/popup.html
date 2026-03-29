@@ -6,147 +6,189 @@
   <title>TL;DR Summarizer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- SVG Icon Definitions -->
-  <svg style="display: none;">
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
     <defs>
-      <!-- Sun Icon -->
-      <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       </symbol>
-
-      <!-- Moon Icon -->
-      <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </symbol>
-
-      <!-- Settings Icon -->
-      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
         <circle cx="12" cy="12" r="3"/>
-        <path d="M12 1v6m0 6v6m5.196-14.196l-4.242 4.242m0 5.656l-4.242 4.242M23 12h-6m-6 0H1m14.196 5.196l-4.242-4.242m0-5.656l-4.242-4.242"/>
       </symbol>
-
-      <!-- Sparkles Icon -->
-      <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 3l1.545 4.635L18.18 9.18l-4.635 1.545L12 15.36l-1.545-4.635L5.82 9.18l4.635-1.545L12 3z"/>
-        <path d="M20 3v4m-2-2h4M6 16v4m-2-2h4"/>
+      <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        <path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>
       </symbol>
-
-      <!-- Copy Icon -->
-      <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
       </symbol>
-
-      <!-- Check Icon -->
-      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"/>
       </symbol>
-
-      <!-- Trash Icon -->
-      <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/>
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      </symbol>
+      <symbol id="icon-document" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13h4"/><path d="M10 17h4"/>
+      </symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </symbol>
+      <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+      </symbol>
+      <symbol id="icon-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
+      </symbol>
+      <symbol id="icon-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+      </symbol>
+      <symbol id="icon-retry" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/>
+      </symbol>
+      <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+      </symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
       </symbol>
     </defs>
   </svg>
 
-  <div class="container">
-    <header>
-      <div class="header-actions">
-        <button id="themeToggle" class="icon-button" title="Toggle dark/light mode" aria-label="Toggle theme">
-          <svg class="icon theme-icon">
-            <use href="#icon-sun"></use>
-          </svg>
+  <div class="app">
+    <!-- Ambient background glow -->
+    <div class="ambient-glow"></div>
+
+    <header class="header">
+      <div class="header-left">
+        <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="icon"><use href="#icon-sun"></use></svg>
         </button>
-        <a href="settings.html" class="icon-button" title="Settings" aria-label="Settings">
-          <svg class="icon">
-            <use href="#icon-settings"></use>
-          </svg>
+        <a href="settings.html" class="icon-btn" title="Settings" aria-label="Settings">
+          <svg class="icon"><use href="#icon-settings"></use></svg>
         </a>
       </div>
-      <div class="logo-section">
-        <h1>TL;DR</h1>
+      <div class="header-center">
+        <h1 class="logo">TL;DR</h1>
         <p class="tagline">AI Article Summarizer</p>
+      </div>
+      <div class="header-right">
+        <button id="historyToggle" class="icon-btn" title="Summary history" aria-label="Summary history">
+          <svg class="icon"><use href="#icon-history"></use></svg>
+        </button>
       </div>
     </header>
 
-    <!-- Context Menu Alert (shown when triggered from right-click) -->
-    <div id="contextAlert" class="context-alert" style="display: none;">
-      <div class="context-alert-content">
-        <span class="context-alert-icon">✨</span>
-        <span id="contextAlertText">Ready to summarize selection</span>
-      </div>
+    <!-- Context Menu Alert -->
+    <div id="contextAlert" class="context-alert" style="display:none;">
+      <svg class="icon-sm"><use href="#icon-sparkles"></use></svg>
+      <span id="contextAlertText">Ready to summarize selection</span>
     </div>
 
-    <div class="controls-section">
-      <!-- Summary Length -->
+    <!-- Controls Row -->
+    <div class="controls-row">
       <div class="control-group">
         <label for="summaryType">Length</label>
         <select id="summaryType" class="select-input">
           <option value="short">Short (2-3 sentences)</option>
           <option value="medium" selected>Medium (3-5 sentences)</option>
           <option value="detailed">Detailed (7-10 sentences)</option>
+          <option value="bullets">Key Points (bullets)</option>
         </select>
       </div>
+      <button id="summarizeBtn" class="btn-summarize">
+        <svg class="icon-sm"><use href="#icon-sparkles"></use></svg>
+        <span>Summarize</span>
+      </button>
     </div>
 
-    <button id="summarizeBtn" class="btn-primary">
-      <svg class="btn-icon">
-        <use href="#icon-sparkles"></use>
-      </svg>
-      <span class="btn-text">Summarize Article</span>
-    </button>
+    <!-- Focus Input -->
+    <div class="focus-row">
+      <input type="text" id="focusInput" class="focus-input" placeholder="Focus on... (optional)" maxlength="200" autocomplete="off">
+    </div>
 
-    <!-- Loading State -->
-    <div id="loadingContainer" class="loading-container">
-      <div class="typing-indicator">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
+    <!-- Main Content Area -->
+    <div class="content-area">
+
+      <!-- Empty / Welcome State -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-orb">
+          <svg class="icon-xl"><use href="#icon-sparkles"></use></svg>
+        </div>
+        <h2 class="empty-state-title">Ready to summarize</h2>
+        <p class="empty-state-desc">Navigate to any article and click Summarize,<br>or select text and right-click.</p>
+        <div class="shortcut-chip">
+          <kbd>Ctrl+Shift+S</kbd>
+        </div>
       </div>
-      <div id="loadingText" class="loading-text">Analyzing article...</div>
+
+      <!-- Loading State -->
+      <div id="loadingContainer" class="loading-state" style="display:none;">
+        <div class="spinner-ring"></div>
+        <div id="elapsedTimer" class="elapsed-timer">0.0s</div>
+        <div id="loadingText" class="loading-text">Analyzing article...</div>
+      </div>
+
+      <!-- Status / Error Messages -->
+      <div id="status" class="status-msg" style="display:none;">
+        <span id="statusIcon" class="status-icon"></span>
+        <span id="statusText"></span>
+        <button id="retryBtn" class="btn-retry" style="display:none;">
+          <svg class="icon-xs"><use href="#icon-retry"></use></svg>
+          Retry
+        </button>
+      </div>
+
+      <!-- Summary Display -->
+      <div id="summary" class="summary-card" style="display:none;"></div>
+
+      <!-- Action Buttons -->
+      <div id="actions" class="actions-row" style="display:none;">
+        <button id="copyBtn" class="btn-action">
+          <svg class="icon-sm icon-copy-ref"><use href="#icon-copy"></use></svg>
+          <span>Copy</span>
+        </button>
+        <button id="clearBtn" class="btn-action">
+          <svg class="icon-sm"><use href="#icon-trash"></use></svg>
+          <span>Clear</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Status Messages -->
-    <div id="status" class="status"></div>
-
-    <!-- Summary Display -->
-    <div id="summary" class="summary-card"></div>
-
-    <!-- Action Buttons -->
-    <div class="actions" id="actions" style="display: none;">
-      <button id="copyBtn" class="btn-secondary">
-        <svg class="btn-icon icon-copy-btn">
-          <use href="#icon-copy"></use>
-        </svg>
-        <span>Copy</span>
-      </button>
-      <button id="clearBtn" class="btn-secondary">
-        <svg class="btn-icon">
-          <use href="#icon-trash"></use>
-        </svg>
-        <span>Clear</span>
-      </button>
-    </div>
-
+    <!-- Footer -->
     <footer class="footer">
-      <div class="footer-tip">
-        <span class="tip-icon">💡</span>
-        <span>Press Ctrl+Shift+S or right-click any text</span>
-      </div>
+      <svg class="icon-xs"><use href="#icon-lightbulb"></use></svg>
+      <span>Press <kbd>Ctrl+Shift+S</kbd> or right-click any text</span>
     </footer>
+
+    <!-- History Drawer Overlay -->
+    <div id="historyOverlay" class="history-overlay"></div>
+
+    <!-- History Drawer -->
+    <div id="historyDrawer" class="history-drawer">
+      <div class="history-drawer-header">
+        <button id="historyClose" class="icon-btn" aria-label="Close history">
+          <svg class="icon"><use href="#icon-arrow-left"></use></svg>
+        </button>
+        <h2>History</h2>
+        <button id="historyClear" class="icon-btn" title="Clear all history" aria-label="Clear history">
+          <svg class="icon"><use href="#icon-trash"></use></svg>
+        </button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+      <div id="historyEmpty" class="history-empty" style="display:none;">
+        <svg class="icon-lg"><use href="#icon-history"></use></svg>
+        <p>No summaries yet</p>
+      </div>
+    </div>
   </div>
 
   <script src="popup.js"></script>

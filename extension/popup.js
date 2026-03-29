@@ -1,130 +1,172 @@
+// TL;DR v3.0 — Obsidian Reader
 // Production API URL
 const API_URL = 'https://tldr-article-summarizer-production.up.railway.app/api/summarize';
 
-// Global state
+// ── State ──────────────────────────────
 let contextMenuData = null;
+let timerInterval = null;
+let timerStart = 0;
 
-// Load saved configuration and check for context menu action
+// ── Initialize ─────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load theme preference
   const result = await chrome.storage.sync.get(['theme', 'colorScheme', 'defaultSummaryType']);
 
+  // Theme
   const theme = result.theme || 'dark';
   document.body.setAttribute('data-theme', theme);
   updateThemeIcon(theme);
 
-  // Load color scheme
+  // Color scheme
   const colorScheme = result.colorScheme || 'purple';
   document.body.setAttribute('data-color', colorScheme);
 
-  // Load default summary type
-  const defaultSummaryType = result.defaultSummaryType || 'medium';
-  document.getElementById('summaryType').value = defaultSummaryType;
+  // Default summary type
+  document.getElementById('summaryType').value = result.defaultSummaryType || 'medium';
 
-  // Check if opened from context menu
+  // Check context menu action
   await checkContextMenuAction();
 });
 
-// Check for context menu action
+// ── Context Menu ───────────────────────
 async function checkContextMenuAction() {
   try {
     const response = await chrome.runtime.sendMessage({ action: 'getContextMenuAction' });
-
     if (response && response.text) {
       contextMenuData = response;
-
-      // Show context alert
       const alert = document.getElementById('contextAlert');
-      const alertText = document.getElementById('contextAlertText');
-
-      alertText.textContent = 'Ready to summarize selection';
-      alert.style.display = 'block';
-
-      // Auto-trigger summarization after a brief delay
-      setTimeout(() => {
-        document.getElementById('summarizeBtn').click();
-      }, 800);
-
-      // Clear the context menu action
+      document.getElementById('contextAlertText').textContent = 'Ready to summarize selection';
+      alert.style.display = 'flex';
+      setTimeout(() => document.getElementById('summarizeBtn').click(), 600);
       await chrome.storage.local.remove('contextMenuAction');
     }
-  } catch (error) {
-    console.log('No context menu action:', error);
+  } catch (e) {
+    // No context menu action pending
   }
 }
 
-// Theme toggle
+// ── Theme Toggle ───────────────────────
 document.getElementById('themeToggle').addEventListener('click', async () => {
-  const currentTheme = document.body.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-  document.body.setAttribute('data-theme', newTheme);
-  await chrome.storage.sync.set({ theme: newTheme });
-  updateThemeIcon(newTheme);
+  const current = document.body.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  await chrome.storage.sync.set({ theme: next });
+  updateThemeIcon(next);
 });
 
 function updateThemeIcon(theme) {
-  const themeIcon = document.querySelector('.theme-icon use');
-  themeIcon.setAttribute('href', theme === 'dark' ? '#icon-sun' : '#icon-moon');
+  document.querySelector('#themeToggle .icon use')
+    .setAttribute('href', theme === 'dark' ? '#icon-sun' : '#icon-moon');
 }
 
-// Main summarization function
+// ── Elapsed Timer ──────────────────────
+function startTimer() {
+  timerStart = Date.now();
+  const el = document.getElementById('elapsedTimer');
+  el.textContent = '0.0s';
+  timerInterval = setInterval(() => {
+    el.textContent = ((Date.now() - timerStart) / 1000).toFixed(1) + 's';
+  }, 100);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+// ── Loading Helpers ────────────────────
+function showLoading(msg) {
+  hideEmptyState();
+  const c = document.getElementById('loadingContainer');
+  document.getElementById('loadingText').textContent = msg;
+  document.getElementById('elapsedTimer').textContent = '0.0s';
+  c.style.display = 'flex';
+  startTimer();
+}
+
+function updateLoadingText(msg) {
+  document.getElementById('loadingText').textContent = msg;
+}
+
+function hideLoading() {
+  document.getElementById('loadingContainer').style.display = 'none';
+  stopTimer();
+}
+
+// ── Status Helpers ─────────────────────
+function showStatus(message, type) {
+  const el = document.getElementById('status');
+  const textEl = document.getElementById('statusText');
+  const retryEl = document.getElementById('retryBtn');
+
+  textEl.textContent = message;
+  el.className = 'status-msg ' + type;
+  el.style.display = 'flex';
+  retryEl.style.display = type === 'error' ? 'inline-flex' : 'none';
+
+  if (type === 'success') {
+    setTimeout(() => { el.style.display = 'none'; }, 3000);
+  }
+}
+
+function hideStatus() {
+  document.getElementById('status').style.display = 'none';
+  document.getElementById('retryBtn').style.display = 'none';
+}
+
+// ── Empty State ────────────────────────
+function showEmptyState() {
+  document.getElementById('emptyState').style.display = 'flex';
+}
+
+function hideEmptyState() {
+  document.getElementById('emptyState').style.display = 'none';
+}
+
+// ── Main Summarize ─────────────────────
 document.getElementById('summarizeBtn').addEventListener('click', async () => {
-  const button = document.getElementById('summarizeBtn');
+  const btn = document.getElementById('summarizeBtn');
   const summaryDiv = document.getElementById('summary');
   const actionsDiv = document.getElementById('actions');
   const summaryType = document.getElementById('summaryType').value;
   const startTime = Date.now();
 
-  button.disabled = true;
-  summaryDiv.classList.remove('visible');
+  btn.disabled = true;
+  summaryDiv.style.display = 'none';
   actionsDiv.style.display = 'none';
   hideStatus();
   showLoading('Analyzing article...');
 
   try {
-    let content;
-    let tab;
+    let content, tab;
 
-    // Check if we have content from context menu
     if (contextMenuData && contextMenuData.text) {
       content = contextMenuData.text;
-      contextMenuData = null; // Clear after use
-
-      // Get current tab for URL
+      contextMenuData = null;
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       tab = tabs[0];
     } else {
-      // Get the current tab
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       tab = tabs[0];
-
-      // Extract article content from the page
       const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: extractArticleContent
       });
-
       content = results[0].result;
     }
 
     if (!content || content.length < 100) {
       hideLoading();
-      showStatus('No article content found on this page. Try selecting text or visit an article page.', 'error');
-      button.disabled = false;
+      showStatus('Not enough content found. If this page is paywalled or requires login, try selecting the article text and right-clicking instead.', 'error');
+      btn.disabled = false;
       return;
     }
 
-    updateLoadingText('Preparing content for AI...');
+    updateLoadingText('AI is summarizing...');
 
-    // Calculate word count and reading time
     const wordCount = content.trim().split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / 200);
+    const focus = document.getElementById('focusInput').value.trim();
 
-    await sleep(300);
-    updateLoadingText('AI is analyzing...');
-
-    // Send to API with timeout handling
+    // API call
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000);
 
@@ -133,248 +175,339 @@ document.getElementById('summarizeBtn').addEventListener('click', async () => {
       response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          url: tab.url,
-          summaryType
-        }),
+        body: JSON.stringify({ content, url: tab.url, summaryType, focus }),
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-    } catch (fetchError) {
+    } catch (fetchErr) {
       clearTimeout(timeoutId);
-      if (fetchError.name === 'AbortError') {
+      if (fetchErr.name === 'AbortError') {
         throw new Error('Request timed out. The article might be too long or the server is busy.');
       }
-      throw fetchError;
+      throw fetchErr;
     }
-
-    updateLoadingText('Generating summary...');
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || errData.error || `API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    // Begin streaming display
+    hideLoading();
+    summaryDiv.innerHTML = '';
+    const label = document.createElement('div');
+    label.className = 'summary-label';
+    label.innerHTML = '<svg class="icon-sm"><use href="#icon-sparkles"></use></svg> Summary';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'summary-text';
+    const cursor = document.createElement('span');
+    cursor.className = 'typewriter-cursor';
+    textDiv.appendChild(cursor);
+    summaryDiv.appendChild(label);
+    summaryDiv.appendChild(textDiv);
+    summaryDiv.style.display = 'block';
 
-    if (data.summary) {
+    // Read stream
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let sseBuffer = '';
+    let fullSummary = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.done || !parsed.content) continue;
+          fullSummary += parsed.content;
+          cursor.remove();
+          textDiv.innerHTML = formatSummary(fullSummary);
+          textDiv.appendChild(cursor);
+        } catch (e) {}
+      }
+    }
+
+    if (!fullSummary) {
+      summaryDiv.style.display = 'none';
+      showStatus('Failed to generate summary. Please try again.', 'error');
+    } else {
+      cursor.remove();
       const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
-
-      summaryDiv.innerHTML = `
-        <strong>Summary</strong>
-        ${formatSummary(data.summary)}
-        <div class="meta-info">
-          <div class="meta-item">📄 ${wordCount} words</div>
-          <div class="meta-item">⏱️ ~${readingTime} min read</div>
-          <div class="meta-item">⚡ ${processingTime}s</div>
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'meta-info';
+      metaDiv.innerHTML = `
+        <div class="meta-item">
+          <svg class="icon-xs"><use href="#icon-document"></use></svg>
+          ${wordCount.toLocaleString()} words
+        </div>
+        <div class="meta-item">
+          <svg class="icon-xs"><use href="#icon-clock"></use></svg>
+          ~${readingTime} min read
+        </div>
+        <div class="meta-item">
+          <svg class="icon-xs"><use href="#icon-zap"></use></svg>
+          ${processingTime}s
         </div>
       `;
-
-      hideLoading();
-      summaryDiv.classList.add('visible');
+      metaDiv.style.opacity = '0';
+      summaryDiv.appendChild(metaDiv);
+      setTimeout(() => { metaDiv.style.transition = 'opacity .4s ease'; metaDiv.style.opacity = '1'; }, 50);
       actionsDiv.style.display = 'grid';
-
-      // Store the last summary for copy functionality
-      summaryDiv.dataset.rawSummary = data.summary;
-
-      // Cache the summary
-      await cacheSummary(tab.url, data.summary, wordCount, readingTime);
-    } else {
-      hideLoading();
-      showStatus('Failed to generate summary. Please try again.', 'error');
+      summaryDiv.dataset.rawSummary = fullSummary;
+      await cacheSummary(tab.url, fullSummary, wordCount, readingTime);
     }
 
   } catch (error) {
     console.error('Error:', error);
     hideLoading();
-    showStatus(`Error: ${error.message}`, 'error');
+    showStatus(error.message, 'error');
   }
 
-  button.disabled = false;
+  btn.disabled = false;
 });
 
-// Format summary with better HTML rendering
+// ── Retry ──────────────────────────────
+document.getElementById('retryBtn').addEventListener('click', () => {
+  hideStatus();
+  document.getElementById('summarizeBtn').click();
+});
+
+// ── Format Summary ─────────────────────
 function formatSummary(summary) {
-  return summary
+  return escapeHtml(summary)
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>');
 }
 
-// Copy to clipboard with animation
+// ── Copy ───────────────────────────────
 document.getElementById('copyBtn').addEventListener('click', async () => {
-  const summaryDiv = document.getElementById('summary');
-  const summary = summaryDiv.dataset.rawSummary;
-  const copyBtn = document.getElementById('copyBtn');
-  const copyIcon = copyBtn.querySelector('.icon-copy-btn use');
+  const raw = document.getElementById('summary').dataset.rawSummary;
+  const btn = document.getElementById('copyBtn');
+  const iconUse = btn.querySelector('.icon-copy-ref use');
 
   try {
-    await navigator.clipboard.writeText(summary);
-
-    // Success animation
-    copyBtn.classList.add('copied');
-    copyIcon.setAttribute('href', '#icon-check');
-
+    await navigator.clipboard.writeText(raw);
+    btn.classList.add('copied');
+    iconUse.setAttribute('href', '#icon-check');
     showStatus('Copied to clipboard!', 'success');
-
-    // Reset after animation
     setTimeout(() => {
-      copyBtn.classList.remove('copied');
-      copyIcon.setAttribute('href', '#icon-copy');
+      btn.classList.remove('copied');
+      iconUse.setAttribute('href', '#icon-copy');
     }, 2000);
-
   } catch (err) {
     showStatus('Failed to copy to clipboard', 'error');
   }
 });
 
-// Clear summary
+// ── Clear ──────────────────────────────
 document.getElementById('clearBtn').addEventListener('click', () => {
-  document.getElementById('summary').classList.remove('visible');
+  document.getElementById('summary').style.display = 'none';
   document.getElementById('actions').style.display = 'none';
-  document.getElementById('status').style.display = 'none';
   document.getElementById('contextAlert').style.display = 'none';
+  hideStatus();
+  showEmptyState();
 });
 
-// Helper function to show status messages
-function showStatus(message, type) {
-  const statusDiv = document.getElementById('status');
-  statusDiv.textContent = message;
-  statusDiv.className = `status ${type}`;
-  statusDiv.style.display = 'block';
+// ── History Drawer ─────────────────────
+document.getElementById('historyToggle').addEventListener('click', () => {
+  openHistory();
+});
 
-  if (type === 'success') {
-    setTimeout(() => {
-      statusDiv.style.display = 'none';
-    }, 3000);
+document.getElementById('historyClose').addEventListener('click', () => {
+  closeHistory();
+});
+
+document.getElementById('historyOverlay').addEventListener('click', () => {
+  closeHistory();
+});
+
+document.getElementById('historyClear').addEventListener('click', async () => {
+  await chrome.storage.local.set({ summaryCache: [] });
+  renderHistory([]);
+});
+
+function openHistory() {
+  document.getElementById('historyDrawer').classList.add('open');
+  document.getElementById('historyOverlay').classList.add('open');
+  loadHistory();
+}
+
+function closeHistory() {
+  document.getElementById('historyDrawer').classList.remove('open');
+  document.getElementById('historyOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('historyDrawer').classList.contains('open')) {
+    closeHistory();
   }
+});
+
+async function loadHistory() {
+  const result = await chrome.storage.local.get(['summaryCache']);
+  renderHistory(result.summaryCache || []);
 }
 
-// Helper function to hide status
-function hideStatus() {
-  document.getElementById('status').style.display = 'none';
+function renderHistory(cache) {
+  const listEl = document.getElementById('historyList');
+  const emptyEl = document.getElementById('historyEmpty');
+
+  if (!cache.length) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = cache.map((entry, i) => {
+    const domain = extractDomain(entry.url);
+    const preview = entry.summary.substring(0, 120) + (entry.summary.length > 120 ? '...' : '');
+    const ago = timeAgo(entry.timestamp);
+    return `
+      <div class="history-item" data-idx="${i}" tabindex="0" role="button">
+        <div class="history-item-domain">${escapeHtml(domain)}</div>
+        <div class="history-item-preview">${escapeHtml(preview)}</div>
+        <div class="history-item-meta">
+          <span>${entry.wordCount?.toLocaleString() || '?'} words</span>
+          <span>${ago}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  listEl.querySelectorAll('.history-item').forEach(el => {
+    const handler = () => {
+      const idx = parseInt(el.dataset.idx);
+      loadHistorySummary(cache[idx]);
+    };
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+    });
+  });
 }
 
-// Show loading with typing animation
-function showLoading(message) {
-  const container = document.getElementById('loadingContainer');
-  const text = document.getElementById('loadingText');
-  text.textContent = message;
-  container.classList.add('visible');
+function loadHistorySummary(entry) {
+  hideEmptyState();
+  hideStatus();
+  const summaryDiv = document.getElementById('summary');
+  const actionsDiv = document.getElementById('actions');
+
+  const metaHtml = `
+    <div class="meta-item">
+      <svg class="icon-xs"><use href="#icon-document"></use></svg>
+      ${(entry.wordCount || 0).toLocaleString()} words
+    </div>
+    <div class="meta-item">
+      <svg class="icon-xs"><use href="#icon-clock"></use></svg>
+      ~${entry.readingTime || '?'} min read
+    </div>
+  `;
+
+  summaryDiv.innerHTML = '';
+  const label = document.createElement('div');
+  label.className = 'summary-label';
+  label.innerHTML = '<svg class="icon-sm"><use href="#icon-sparkles"></use></svg> Summary';
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'summary-text';
+  textDiv.innerHTML = formatSummary(entry.summary);
+
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'meta-info';
+  metaDiv.innerHTML = metaHtml;
+
+  summaryDiv.appendChild(label);
+  summaryDiv.appendChild(textDiv);
+  summaryDiv.appendChild(metaDiv);
+  summaryDiv.dataset.rawSummary = entry.summary;
+  summaryDiv.style.display = 'block';
+  actionsDiv.style.display = 'grid';
+
+  closeHistory();
 }
 
-// Update loading text
-function updateLoadingText(message) {
-  const text = document.getElementById('loadingText');
-  text.textContent = message;
+// ── Utilities ──────────────────────────
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace('www.', ''); }
+  catch { return 'unknown'; }
 }
 
-// Hide loading
-function hideLoading() {
-  const container = document.getElementById('loadingContainer');
-  container.classList.remove('visible');
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
 }
 
-// Sleep utility
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
 }
 
-// Cache summary
+// ── Cache ──────────────────────────────
 async function cacheSummary(url, summary, wordCount, readingTime) {
   try {
-    const cacheEntry = {
-      url,
-      summary,
-      wordCount,
-      readingTime,
-      timestamp: Date.now()
-    };
-
-    // Get existing cache
+    const entry = { url, summary, wordCount, readingTime, timestamp: Date.now() };
     const result = await chrome.storage.local.get(['summaryCache']);
     const cache = result.summaryCache || [];
-
-    // Add new entry and keep last 20
-    cache.unshift(cacheEntry);
+    cache.unshift(entry);
     if (cache.length > 20) cache.pop();
-
     await chrome.storage.local.set({ summaryCache: cache });
-  } catch (error) {
-    console.error('Failed to cache summary:', error);
+  } catch (e) {
+    console.error('Cache error:', e);
   }
 }
 
-// This function runs in the page context to extract article content
+// ── Content Extraction ─────────────────
 function extractArticleContent() {
-  // Try multiple strategies to find article content
-
-  // Strategy 1: Look for common article containers
   const articleSelectors = [
-    'article',
-    '[role="article"]',
-    '[role="main"] article',
-    'main article',
-    '.article-content',
-    '.post-content',
-    '.entry-content',
-    '.content-body',
-    '.article-body',
-    '[itemprop="articleBody"]'
+    'article', '[role="article"]', '[role="main"] article', 'main article',
+    '.article-content', '.post-content', '.entry-content', '.content-body',
+    '.article-body', '[itemprop="articleBody"]'
   ];
 
-  for (const selector of articleSelectors) {
-    const element = document.querySelector(selector);
-    if (element) {
-      const text = element.innerText.trim();
-      if (text.length > 200) {
-        return text;
-      }
+  for (const sel of articleSelectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const t = el.innerText.trim();
+      if (t.length > 200) return t;
     }
   }
 
-  // Strategy 2: Look for main content area
   const mainSelectors = ['main', '[role="main"]', '#content', '#main-content'];
-
-  for (const selector of mainSelectors) {
-    const element = document.querySelector(selector);
-    if (element) {
-      const text = element.innerText.trim();
-      if (text.length > 200) {
-        return text;
-      }
+  for (const sel of mainSelectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const t = el.innerText.trim();
+      if (t.length > 200) return t;
     }
   }
 
-  // Strategy 3: Fallback - get all paragraph text
   const paragraphs = document.querySelectorAll('p');
-  const paragraphText = Array.from(paragraphs)
+  const pText = Array.from(paragraphs)
     .map(p => p.innerText.trim())
-    .filter(text => text.length > 50)
+    .filter(t => t.length > 50)
     .join('\n\n');
+  if (pText.length > 200) return pText;
 
-  if (paragraphText.length > 200) {
-    return paragraphText;
-  }
-
-  // Strategy 4: Last resort - get body text but try to filter out navigation
   const body = document.body;
   if (body) {
     const exclude = body.querySelectorAll('nav, header, footer, aside, .sidebar, .menu');
-    const originalDisplay = [];
-    exclude.forEach((el, i) => {
-      originalDisplay[i] = el.style.display;
-      el.style.display = 'none';
-    });
-
+    const saved = [];
+    exclude.forEach((el, i) => { saved[i] = el.style.display; el.style.display = 'none'; });
     const text = body.innerText.trim();
-
-    // Restore hidden elements
-    exclude.forEach((el, i) => {
-      el.style.display = originalDisplay[i];
-    });
-
+    exclude.forEach((el, i) => { el.style.display = saved[i]; });
     return text;
   }
 

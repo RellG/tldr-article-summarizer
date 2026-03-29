@@ -80,7 +80,7 @@ app.post('/api/summarize', async (req, res) => {
   }
 
   try {
-    const { content, url, summaryType = 'medium' } = req.body;
+    const { content, url, summaryType = 'medium', focus = '' } = req.body;
 
     console.log(`[${new Date().toISOString()}] Summarize request - URL: ${url}, Content length: ${content?.length}, Type: ${summaryType}`);
 
@@ -93,7 +93,7 @@ app.post('/api/summarize', async (req, res) => {
     }
 
     // Limit content length for API efficiency and speed
-    const maxLength = 4000;
+    const maxLength = 10000;
     const truncatedContent = content.length > maxLength
       ? content.substring(0, maxLength) + '...'
       : content;
@@ -102,6 +102,7 @@ app.post('/api/summarize', async (req, res) => {
 
     // Build prompt based on summary type
     let lengthInstruction;
+    let systemPrompt = 'You are a helpful assistant that creates clear, concise summaries of articles in paragraph form.';
     switch(summaryType) {
       case 'short':
         lengthInstruction = '2-3 sentences';
@@ -109,17 +110,19 @@ app.post('/api/summarize', async (req, res) => {
       case 'detailed':
         lengthInstruction = '7-10 sentences';
         break;
+      case 'bullets':
+        lengthInstruction = 'as 4-6 concise bullet points. Start each bullet with "• "';
+        systemPrompt = 'You are a helpful assistant that creates clear, concise bullet-point summaries of articles.';
+        break;
       case 'medium':
       default:
         lengthInstruction = '3-5 sentences';
     }
 
-    const systemPrompt = 'You are a helpful assistant that creates clear, concise summaries of articles in paragraph form.';
-    const prompt = `Summarize the following article in ${lengthInstruction}, capturing the main points:\n\n${truncatedContent}`;
+    const focusClause = focus ? ` Focus especially on: ${focus}.` : '';
+    const prompt = `Summarize the following article in ${lengthInstruction}, capturing the main points.${focusClause}\n\n${truncatedContent}`;
 
     // Try models with fallback on rate limit (429) errors
-    let result = null;
-    let usedModel = OPENAI_MODEL;
     let lastError = null;
 
     // Build list of models to try (primary first, then fallbacks)
@@ -128,7 +131,7 @@ app.post('/api/summarize', async (req, res) => {
     for (const model of modelsToTry) {
       console.log(`[${new Date().toISOString()}] Trying model: ${model}`);
 
-      // Call OpenRouter API with timeout
+      // Call OpenAI API with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
 
@@ -145,17 +148,12 @@ app.post('/api/summarize', async (req, res) => {
             body: JSON.stringify({
               model: model,
               messages: [
-                {
-                  role: 'system',
-                  content: systemPrompt
-                },
-                {
-                  role: 'user',
-                  content: prompt
-                }
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt }
               ],
               temperature: 0.3,
-              max_tokens: 500
+              max_tokens: 500,
+              stream: true
             }),
             signal: controller.signal
           }
@@ -182,37 +180,51 @@ app.post('/api/summarize', async (req, res) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('OpenRouter API error:', response.status, errorText);
+        console.error('OpenAI API error:', response.status, errorText);
         lastError = new Error(`API request failed: ${response.status}`);
         continue; // Try next model
       }
 
-      // Success! Parse result and break
-      result = await response.json();
-      usedModel = model;
-      console.log(`[${new Date().toISOString()}] Success with model: ${model}`);
-      break;
+      // Success — stream response to client
+      console.log(`[${new Date().toISOString()}] Streaming from model: ${model}`);
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      let streamBuf = '';
+      let summaryText = '';
+
+      try {
+        for await (const chunk of response.body) {
+          streamBuf += chunk.toString();
+          const lines = streamBuf.split('\n');
+          streamBuf = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              const token = JSON.parse(data).choices?.[0]?.delta?.content;
+              if (token) {
+                summaryText += token;
+                res.write(`data: ${JSON.stringify({ content: token })}\n\n`);
+              }
+            } catch (e) { /* skip malformed chunk */ }
+          }
+        }
+      } catch (streamErr) {
+        console.error(`[${new Date().toISOString()}] Stream error:`, streamErr.message);
+      }
+
+      const processingTime = Date.now() - startTime;
+      console.log(`[${new Date().toISOString()}] Streamed in ${processingTime}ms`);
+      res.write(`data: ${JSON.stringify({ done: true, model, originalLength: content.length, processingTime })}\n\n`);
+      res.end();
+      return;
     }
 
-    // If all models failed, throw the last error
-    if (!result) {
-      throw lastError || new Error('All models failed. Please try again later.');
-    }
-
-    // Extract summary from response
-    const summary = result.choices?.[0]?.message?.content || 'Unable to generate summary';
-
-    const processingTime = Date.now() - startTime;
-    console.log(`[${new Date().toISOString()}] Success! Processed in ${processingTime}ms`);
-
-    res.json({
-      summary: summary.trim(),
-      originalLength: content.length,
-      summaryLength: summary.length,
-      url,
-      timestamp: new Date().toISOString(),
-      model: usedModel
-    });
+    // All models failed
+    throw lastError || new Error('All models failed. Please try again later.');
 
   } catch (error) {
     const processingTime = Date.now() - startTime;

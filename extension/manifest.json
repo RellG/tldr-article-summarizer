@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TL;DR Article Summarizer",
-  "version": "2.9.1",
+  "version": "3.0.0",
   "description": "Summarize articles instantly with AI-powered insights. Powered by Meta Llama 3.3 70B.",
   "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
   "background": {

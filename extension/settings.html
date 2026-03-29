@@ -6,7 +6,7 @@
   <title>TL;DR Settings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
@@ -34,14 +34,17 @@
       transition: var(--transition);
       color: var(--text-secondary);
       text-decoration: none;
-      font-size: 20px;
-      font-weight: 600;
     }
 
     .back-button:hover {
       background: var(--bg-tertiary);
       border-color: var(--border-hover);
       transform: translateX(-2px);
+    }
+
+    .back-button .icon-sm {
+      width: 18px;
+      height: 18px;
     }
 
     .settings-title {
@@ -69,6 +72,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .settings-section h3 .icon-sm {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
     .settings-section p {
@@ -143,16 +152,94 @@
       text-decoration: underline;
     }
 
-    .section-icon {
-      font-size: 18px;
+    /* History management section */
+    .history-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-info:last-child {
+      border-bottom: none;
+    }
+
+    .history-count {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .history-count span {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .btn-clear-history {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-clear-history:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .btn-clear-history:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-clear-history .icon-xs {
+      width: 14px;
+      height: 14px;
     }
   </style>
 </head>
 <body>
+  <!-- SVG Icon Definitions -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <defs>
+      <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </symbol>
+      <symbol id="icon-document" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13h4"/><path d="M10 17h4"/>
+      </symbol>
+      <symbol id="icon-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>
+      </symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      </symbol>
+      <symbol id="icon-lightbulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <div class="container">
     <header>
       <div class="settings-header">
-        <a href="popup.html" class="back-button" title="Back to main" aria-label="Back">←</a>
+        <a href="popup.html" class="back-button" title="Back to main" aria-label="Back">
+          <svg class="icon-sm"><use href="#icon-arrow-left"></use></svg>
+        </a>
         <div class="settings-title">
           <h1>Settings</h1>
           <p class="tagline">Configure your preferences</p>
@@ -162,7 +249,10 @@
 
     <!-- Theme Settings -->
     <div class="settings-section">
-      <h3><span class="section-icon">🎨</span> Appearance</h3>
+      <h3>
+        <svg class="icon-sm"><use href="#icon-settings"></use></svg>
+        Appearance
+      </h3>
       <p>Choose your preferred theme and color scheme.</p>
 
       <label for="themeSelect">Theme</label>
@@ -182,27 +272,50 @@
 
     <!-- Default Summary Type -->
     <div class="settings-section">
-      <h3><span class="section-icon">📏</span> Default Summary Length</h3>
+      <h3>
+        <svg class="icon-sm"><use href="#icon-document"></use></svg>
+        Default Summary Length
+      </h3>
       <p>Set the default length when opening the extension.</p>
       <label for="defaultSummaryType">Default Length</label>
       <select id="defaultSummaryType" class="select-input">
         <option value="short">Short (2-3 sentences)</option>
         <option value="medium">Medium (3-5 sentences)</option>
         <option value="detailed">Detailed (7-10 sentences)</option>
+        <option value="bullets">Key Points (bullets)</option>
       </select>
+    </div>
+
+    <!-- History Management -->
+    <div class="settings-section">
+      <h3>
+        <svg class="icon-sm"><use href="#icon-history"></use></svg>
+        Summary History
+      </h3>
+      <p>Manage your cached summaries. Up to 20 summaries are stored locally.</p>
+      <div class="history-info">
+        <span class="history-count">Cached summaries: <span id="historyCount">0</span></span>
+        <button id="clearHistoryBtn" class="btn-clear-history" disabled>
+          <svg class="icon-xs"><use href="#icon-trash"></use></svg>
+          Clear All
+        </button>
+      </div>
     </div>
 
     <!-- About -->
     <div class="settings-section">
-      <h3><span class="section-icon">ℹ️</span> About</h3>
+      <h3>
+        <svg class="icon-sm"><use href="#icon-lightbulb"></use></svg>
+        About
+      </h3>
       <div class="about-grid">
         <div class="about-item">
           <span class="about-label">Version</span>
-          <span class="about-value">2.9.1</span>
+          <span class="about-value">3.0.0</span>
         </div>
         <div class="about-item">
           <span class="about-label">AI Model</span>
-          <span class="about-value">Llama 3.3 70B</span>
+          <span class="about-value">GPT-4o mini</span>
         </div>
         <div class="about-item">
           <span class="about-label">Developer</span>

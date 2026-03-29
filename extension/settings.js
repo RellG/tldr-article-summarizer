@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load default summary type
   const defaultSummaryType = result.defaultSummaryType || 'medium';
   document.getElementById('defaultSummaryType').value = defaultSummaryType;
+
+  // Load history count
+  loadHistoryCount();
 });
 
 // Theme change
@@ -25,7 +28,7 @@ document.getElementById('themeSelect').addEventListener('change', async (e) => {
   showSuccess();
 });
 
-// Color scheme change (NEW)
+// Color scheme change
 document.getElementById('colorSelect').addEventListener('change', async (e) => {
   const colorScheme = e.target.value;
   document.body.setAttribute('data-color', colorScheme);
@@ -39,6 +42,22 @@ document.getElementById('defaultSummaryType').addEventListener('change', async (
   await chrome.storage.sync.set({ defaultSummaryType });
   showSuccess();
 });
+
+// Clear history button
+document.getElementById('clearHistoryBtn').addEventListener('click', async () => {
+  await chrome.storage.local.set({ summaryCache: [] });
+  loadHistoryCount();
+  showSuccess();
+});
+
+// Load and display history count
+async function loadHistoryCount() {
+  const data = await chrome.storage.local.get(['summaryCache']);
+  const cache = data.summaryCache || [];
+  const count = cache.length;
+  document.getElementById('historyCount').textContent = count;
+  document.getElementById('clearHistoryBtn').disabled = count === 0;
+}
 
 // Show success message with animation
 function showSuccess() {
