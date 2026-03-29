@@ -47,19 +47,15 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-// OpenRouter API Configuration
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
-const SITE_URL = process.env.SITE_URL || 'http://localhost:8090';
-const SITE_NAME = process.env.SITE_NAME || 'TL;DR Article Summarizer';
+// OpenAI API Configuration
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
-// Fallback models - verified working on OpenRouter (2026-02-11)
+// Fallback models in order of preference
 const FALLBACK_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',       // Primary - high quality
-  'google/gemma-3-27b-it:free',                    // Fast, reliable fallback
-  'mistralai/mistral-small-3.1-24b-instruct:free', // Mistral Small 3.1
-  'nousresearch/hermes-3-llama-3.1-405b:free',     // Large model fallback
-  'meta-llama/llama-3.2-3b-instruct:free'          // Lightweight last resort
+  'gpt-4o-mini',   // Primary - fast, cheap, great for summarization
+  'gpt-3.5-turbo', // Fallback if 4o-mini is rate limited
+  'gpt-4o'         // Last resort
 ];
 
 // Health check endpoint
@@ -92,8 +88,8 @@ app.post('/api/summarize', async (req, res) => {
       return res.status(400).json({ error: 'No content provided' });
     }
 
-    if (!OPENROUTER_API_KEY) {
-      return res.status(500).json({ error: 'OpenRouter API key not configured' });
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
     }
 
     // Limit content length for API efficiency and speed
@@ -123,11 +119,11 @@ app.post('/api/summarize', async (req, res) => {
 
     // Try models with fallback on rate limit (429) errors
     let result = null;
-    let usedModel = OPENROUTER_MODEL;
+    let usedModel = OPENAI_MODEL;
     let lastError = null;
 
     // Build list of models to try (primary first, then fallbacks)
-    const modelsToTry = [OPENROUTER_MODEL, ...FALLBACK_MODELS.filter(m => m !== OPENROUTER_MODEL)];
+    const modelsToTry = [OPENAI_MODEL, ...FALLBACK_MODELS.filter(m => m !== OPENAI_MODEL)];
 
     for (const model of modelsToTry) {
       console.log(`[${new Date().toISOString()}] Trying model: ${model}`);
@@ -139,14 +135,12 @@ app.post('/api/summarize', async (req, res) => {
       let response;
       try {
         response = await fetch(
-          'https://openrouter.ai/api/v1/chat/completions',
+          'https://api.openai.com/v1/chat/completions',
           {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-              'Content-Type': 'application/json',
-              'HTTP-Referer': SITE_URL,
-              'X-Title': SITE_NAME
+              'Authorization': `Bearer ${OPENAI_API_KEY}`,
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               model: model,
