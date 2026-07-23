@@ -82,9 +82,7 @@ See `BUGFIX-SUMMARY.md` for detailed technical analysis.
 
 ### Production Package
 - **File:** `tldr-extension-v2.9.1-simplified.zip`
-- **Location:** `/home/cyphorlogs/TL;DR/`
 - **Size:** ~2MB (includes all extension files)
-- **Download:** http://192.168.4.154:8080/tldr-extension-v2.9.1-simplified.zip
 
 ### Git Repository
 - **Commit:** `6919f91`
@@ -103,7 +101,7 @@ See `BUGFIX-SUMMARY.md` for detailed technical analysis.
 4. Submit for review
 
 ### For Local Testing
-1. Download zip file from http://192.168.4.154:8080/
+1. Download the release zip from the GitHub Releases page
 2. Extract to local directory
 3. Open Chrome > Extensions > Developer Mode
 4. Click "Load unpacked"
@@ -287,16 +285,13 @@ Message: refactor: simplify to 3 length options only (v2.9.1)
 ```bash
 Node.js: v20.19.5
 npm: v10.8.2
-Platform: Linux (Debian 6.1.0-38-amd64)
-Server: vbox (192.168.4.154)
+Platform: Linux (Debian)
 ```
 
-### HTTP Server
+### Local Distribution
 ```bash
-URL: http://192.168.4.154:8080
 File: tldr-extension-v2.9.1-simplified.zip
-Status: Running
-Port: 8080
+Status: Available
 ```
 
 ---

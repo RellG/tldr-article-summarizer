@@ -44,3 +44,8 @@ RECAPIT-INTEGRATION.md
 API-DOCUMENTATION.md
 LAUNCH-CHECKLIST.md
 QWEN-RECAPIT-CONTEXT.md
+API-KEY-UPDATE.md
+
+# Claude Code local config / server-wide notes (never for public repo)
+CLAUDE.md
+.claude/

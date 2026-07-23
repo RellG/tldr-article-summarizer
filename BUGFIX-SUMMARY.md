@@ -147,7 +147,6 @@ Here are 3 action items based on the article:
 
 2. **Push Latest Code:**
    ```bash
-   cd /home/cyphorlogs/TL;DR
    git add .
    git commit -m "fix: use Llama for all styles, fix rate limits"
    git push origin main
@@ -207,9 +206,7 @@ Here are 3 action items based on the article:
 
 ## 📥 Download Fixed Extension
 
-```
-http://192.168.4.154:8080/tldr-extension-v2.9.0-WORKING.zip
-```
+See the GitHub Releases page for the packaged extension zip.
 
 **What's Included:**
 - ✅ All 5 working summary styles
